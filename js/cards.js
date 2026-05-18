@@ -1,5 +1,5 @@
 var START_CARDS_FILES = [
-  'data/starts/s001-花园初绽.json',
+  'data/starts/s001-不小心被卷入纷争后，被迫性转为花园萝莉的我才不会屈服呢！.json',
   'data/starts/s002-枯萎教会.json',
   'data/starts/s003-涩涩午后.json',
   'data/starts/s004-影子市场.json',
