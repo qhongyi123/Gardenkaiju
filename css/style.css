@@ -4,6 +4,7 @@
     --font-main: 'ZCOOL KuaiLe', cursive;
     --font-content: 'Noto Sans SC', sans-serif;
     --font-size-base: 16px;
+    --font-size-cards: 14px;
     --bg-body: #fafdfa;
     --bg-card: #ffffff;
     --bg-content: #f6fdf6;
@@ -231,6 +232,7 @@ body {
     transition: transform 0.2s, box-shadow 0.2s;
     break-inside: avoid;
     margin-bottom: 10px;
+    font-size: var(--font-size-cards);
     min-height: 80px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     border: 1px solid rgba(0,0,0,0.05);

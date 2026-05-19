@@ -179,9 +179,13 @@ function initSettings() {
     if (saved >= 1 && saved <= 5) {
         setColumns(saved);
     }
-    var savedSize = parseInt(localStorage.getItem('garden-fontsize'));
-    if (savedSize) {
-        setFontSize(savedSize);
+    var savedSizeUI = parseInt(localStorage.getItem('garden-fontsize-ui'));
+    if (savedSizeUI) {
+        setFontSizeUI(savedSizeUI);
+    }
+    var savedSizeCards = parseInt(localStorage.getItem('garden-fontsize-cards'));
+    if (savedSizeCards) {
+        setFontSizeCards(savedSizeCards);
     }
     var savedFont = localStorage.getItem('garden-font');
     if (savedFont) {
@@ -196,11 +200,21 @@ var FONT_MAP = {
     mashan: "'Ma Shan Zheng', cursive"
 };
 
-function setFontSize(n) {
+function setFontSizeUI(n) {
     document.body.style.setProperty('--font-size-base', n + 'px');
-    localStorage.setItem('garden-fontsize', n);
+    localStorage.setItem('garden-fontsize-ui', n);
     var sizeIdx = { 12: 0, 16: 1, 20: 2, 24: 3 };
     var btns = document.querySelectorAll('.settings-row:nth-of-type(2) .col-btn');
+    btns.forEach(function(btn, i) {
+        btn.classList.toggle('active', i === sizeIdx[n]);
+    });
+}
+
+function setFontSizeCards(n) {
+    document.body.style.setProperty('--font-size-cards', n + 'px');
+    localStorage.setItem('garden-fontsize-cards', n);
+    var sizeIdx = { 12: 0, 14: 1, 18: 2, 22: 3 };
+    var btns = document.querySelectorAll('.settings-row:nth-of-type(3) .col-btn');
     btns.forEach(function(btn, i) {
         btn.classList.toggle('active', i === sizeIdx[n]);
     });
