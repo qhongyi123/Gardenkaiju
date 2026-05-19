@@ -17,7 +17,9 @@ function switchTab(tabId) {
 function extractFilename(path) {
     var parts = path.split('/');
     var name = parts[parts.length - 1];
-    return name.replace(/\.json$/i, '');
+    name = name.replace(/\.json$/i, '');
+    name = name.replace(/^(s|sub)\d+-/, '');
+    return name;
 }
 
 async function loadCards(fileList) {
@@ -45,14 +47,13 @@ function renderStartCards(containerId, dataArray) {
     var html = '';
     dataArray.forEach(function(card) {
         var bgClass = card.color ? 'card-bg-' + card.color : 'card-bg-soft-green';
-        html += '<div class="start-card ' + bgClass + '" data-id="' + card.id + '">';
+        var imgClass = card.image ? ' has-image' : '';
+        html += '<div class="start-card ' + bgClass + imgClass + '" data-id="' + card.id + '">';
 
         html += '<div class="card-filename">' + escapeHtml(card._filename) + '</div>';
 
         if (card.image) {
             html += '<div class="card-image"><img src="' + escapeHtml(card.image) + '" alt="" loading="lazy"></div>';
-        } else {
-            html += '<div class="card-image"></div>';
         }
 
         if (card.tags && card.tags.length > 0) {
