@@ -1,0 +1,105 @@
+<head>
+<meta charset="UTF-8">
+<base href="https://qhongyi123.github.io/Gardenkaiju/">
+<title>花园</title>
+<!-- disable-default-loading -->
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<link rel="stylesheet" href="css/style.css">
+</head>
+<body>
+
+<div class="container">
+    <div class="header">
+        <h1>✨ 花园 ✨</h1>
+    </div>
+
+    <div class="tabs-nav">
+        <button class="tab-btn active" onclick="switchTab('tab1')">前言</button>
+        <button class="tab-btn" onclick="switchTab('tab2')">花园历史</button>
+        <button class="tab-btn" onclick="switchTab('tab3')">开局</button>
+        <button class="tab-btn" onclick="switchTab('tab4')">投稿开局</button>
+        <button class="tab-btn" onclick="switchTab('tab5')">设置</button>
+    </div>
+
+    <div id="tab1" class="tab-content active">
+        <div class="preface-section" id="preface-content">
+            📖 加载中...
+        </div>
+    </div>
+
+    <div id="tab2" class="tab-content">
+        <div class="history-placeholder" id="history-content">
+            📝 加载中...
+        </div>
+    </div>
+
+    <div id="tab3" class="tab-content">
+        <div class="card-grid" id="start-cards-grid"></div>
+    </div>
+
+    <div id="tab4" class="tab-content">
+        <div class="card-grid" id="submission-cards-grid"></div>
+    </div>
+
+    <div id="tab5" class="tab-content">
+        <div class="settings-section">
+            <h3>⚙ 设置</h3>
+            <div class="settings-row">
+                <span class="settings-label">卡片列数：</span>
+                <button class="col-btn" onclick="setColumns(1)">1</button>
+                <button class="col-btn" onclick="setColumns(2)">2</button>
+                <button class="col-btn" onclick="setColumns(3)">3</button>
+                <button class="col-btn" onclick="setColumns(4)">4</button>
+                <button class="col-btn" onclick="setColumns(5)">5</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 开局详情弹窗 ==================== -->
+<div class="modal-overlay" id="start-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="modal-title">开局标题</h3>
+            <button class="modal-close" onclick="closeModal('start-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-meta">
+                <span class="meta-author" id="modal-author"></span>
+                <span class="meta-time" id="modal-time"></span>
+            </div>
+            <div class="modal-tags" id="modal-tags"></div>
+
+            <div class="modal-section-title">📄 内容粗览</div>
+            <div class="modal-preview" id="modal-preview"></div>
+
+            <div class="modal-actions">
+                <button class="btn btn-secondary" onclick="openViewStartModal()">🔍 查看开局</button>
+                <button class="btn btn-success" onclick="loadStart()">🚀 加载开局</button>
+                <button class="btn btn-primary" onclick="closeModal('start-modal')">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 查看开局弹窗（大） ==================== -->
+<div class="modal-overlay" id="view-start-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="view-modal-title">开局完整内容</h3>
+            <button class="modal-close" onclick="closeModal('view-start-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="view-content-scroll" id="view-full-content"></div>
+            <div class="view-actions-bar">
+                <button class="btn btn-secondary" onclick="closeModal('view-start-modal')">↩️ 返回</button>
+                <button class="btn btn-success" onclick="loadStartFromView()">🚀 加载开局</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/cards.js"></script>
+<script src="js/app.js"></script>
+
+</body>
