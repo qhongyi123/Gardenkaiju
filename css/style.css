@@ -195,23 +195,11 @@ body {
 
 .card-grid {
     display: grid;
-    grid-template-columns: repeat(5, 1fr);
+    grid-template-columns: repeat(3, 1fr);
     gap: 10px;
 }
 
-@media (max-width: 900px) {
-    .card-grid {
-        grid-template-columns: repeat(4, 1fr);
-    }
-}
-
-@media (max-width: 680px) {
-    .card-grid {
-        grid-template-columns: repeat(3, 1fr);
-    }
-}
-
-@media (max-width: 480px) {
+@media (max-width: 500px) {
     .card-grid {
         grid-template-columns: repeat(2, 1fr);
     }
@@ -530,4 +518,55 @@ body {
 }
 .btn-success:hover {
     background: #4caf50;
+}
+
+.settings-section {
+    background: #f6fdf6;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--color-border);
+    font-family: var(--font-content);
+}
+
+.settings-section h3 {
+    margin-top: 0;
+    color: var(--color-primary-dark);
+    font-family: var(--font-main);
+}
+
+.settings-row {
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    margin-top: 14px;
+}
+
+.settings-label {
+    font-weight: 500;
+    font-size: 0.95em;
+    white-space: nowrap;
+}
+
+.col-btn {
+    width: 38px;
+    height: 38px;
+    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    background: white;
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-size: 0.95em;
+    color: var(--color-text-light);
+    transition: all 0.2s;
+}
+
+.col-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary-dark);
+}
+
+.col-btn.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
 }
