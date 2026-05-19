@@ -164,6 +164,26 @@ function escapeHtml(str) {
     return div.innerHTML;
 }
 
+function setColumns(n) {
+    document.querySelectorAll('.card-grid').forEach(function(grid) {
+        grid.style.gridTemplateColumns = 'repeat(' + n + ', 1fr)';
+    });
+    localStorage.setItem('garden-columns', n);
+    document.querySelectorAll('.col-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+        if (parseInt(btn.textContent) === n) {
+            btn.classList.add('active');
+        }
+    });
+}
+
+function initSettings() {
+    var saved = parseInt(localStorage.getItem('garden-columns'));
+    if (saved >= 1 && saved <= 5) {
+        setColumns(saved);
+    }
+}
+
 async function loadPreface() {
     var el = document.getElementById('preface-content');
     try {
@@ -207,6 +227,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     renderStartCards('submission-cards-grid', submissionCardsData);
     loadPreface();
     loadHistory();
+    initSettings();
 });
 
 document.addEventListener('click', function(e) {
