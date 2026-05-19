@@ -428,7 +428,7 @@ function refreshCurrentCards() {
 function setFontSizeUI(n) {
     document.body.style.setProperty('--font-size-base', n + 'px');
     localStorage.setItem('garden-fontsize-ui', n);
-    var sizeIdx = { 12: 0, 16: 1, 20: 2, 24: 3 };
+    var sizeIdx = { 12: 0, 16: 1, 20: 2, 24: 3, 28: 4, 32: 5 };
     var btns = document.querySelectorAll('.settings-row:nth-of-type(2) .col-btn');
     btns.forEach(function(btn, i) {
         btn.classList.toggle('active', i === sizeIdx[n]);
@@ -438,7 +438,7 @@ function setFontSizeUI(n) {
 function setFontSizeCards(n) {
     document.body.style.setProperty('--font-size-cards', n + 'px');
     localStorage.setItem('garden-fontsize-cards', n);
-    var sizeIdx = { 12: 0, 14: 1, 18: 2, 22: 3 };
+    var sizeIdx = { 12: 0, 14: 1, 18: 2, 22: 3, 26: 4, 30: 5 };
     var btns = document.querySelectorAll('.settings-row:nth-of-type(3) .col-btn');
     btns.forEach(function(btn, i) {
         btn.classList.toggle('active', i === sizeIdx[n]);
