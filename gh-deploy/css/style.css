@@ -1,8 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=ZCOOL+KuaiLe&family=Noto+Sans+SC:wght@400;500;700&family=Ma+Shan+Zheng&family=Noto+Serif+SC:wght@400;700&display=swap');
 
 :root {
     --font-main: 'ZCOOL KuaiLe', cursive;
     --font-content: 'Noto Sans SC', sans-serif;
+    --font-size-base: 16px;
     --bg-body: #fafdfa;
     --bg-card: #ffffff;
     --bg-content: #f6fdf6;
@@ -24,7 +25,7 @@ body {
     color: var(--color-text);
     margin: 0;
     padding: 10px;
-    font-size: 14px;
+    font-size: var(--font-size-base);
     box-sizing: border-box;
     overflow: auto;
 }
@@ -583,6 +584,36 @@ body {
 }
 
 .col-btn.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.settings-row.separated {
+    border-top: 1px solid var(--color-border);
+    padding-top: 14px;
+    margin-top: 4px;
+}
+
+.font-btn {
+    padding: 6px 14px;
+    border-radius: 8px;
+    border: 2px solid var(--color-border);
+    background: white;
+    cursor: pointer;
+    font-family: inherit;
+    font-size: 0.9em;
+    color: var(--color-text-light);
+    transition: all 0.2s;
+    white-space: nowrap;
+}
+
+.font-btn:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary-dark);
+}
+
+.font-btn.active {
     background: var(--color-primary);
     color: white;
     border-color: var(--color-primary);

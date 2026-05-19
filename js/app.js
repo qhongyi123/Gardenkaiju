@@ -179,6 +179,42 @@ function initSettings() {
     if (saved >= 1 && saved <= 5) {
         setColumns(saved);
     }
+    var savedSize = parseInt(localStorage.getItem('garden-fontsize'));
+    if (savedSize) {
+        setFontSize(savedSize);
+    }
+    var savedFont = localStorage.getItem('garden-font');
+    if (savedFont) {
+        setFontFamily(savedFont);
+    }
+}
+
+var FONT_MAP = {
+    kuaile: "'ZCOOL KuaiLe', cursive",
+    serif: "'Noto Serif SC', serif",
+    sans: "'Noto Sans SC', sans-serif",
+    mashan: "'Ma Shan Zheng', cursive"
+};
+
+function setFontSize(n) {
+    document.body.style.setProperty('--font-size-base', n + 'px');
+    localStorage.setItem('garden-fontsize', n);
+    var sizeIdx = { 12: 0, 16: 1, 20: 2, 24: 3 };
+    var btns = document.querySelectorAll('.settings-row:nth-of-type(2) .col-btn');
+    btns.forEach(function(btn, i) {
+        btn.classList.toggle('active', i === sizeIdx[n]);
+    });
+}
+
+function setFontFamily(key) {
+    var font = FONT_MAP[key] || FONT_MAP.kuaile;
+    document.body.style.setProperty('--font-main', font);
+    localStorage.setItem('garden-font', key);
+    document.querySelectorAll('.font-btn').forEach(function(btn) {
+        btn.classList.remove('active');
+    });
+    var btn = document.querySelector('.font-btn[onclick*=\"' + key + '\"]');
+    if (btn) btn.classList.add('active');
 }
 
 async function loadPreface() {
