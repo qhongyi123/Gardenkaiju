@@ -225,11 +225,15 @@ body {
     justify-content: space-between;
     cursor: pointer;
     transition: transform 0.2s, box-shadow 0.2s;
-    aspect-ratio: 9 / 16;
+    min-height: 80px;
     box-shadow: 0 2px 8px rgba(0,0,0,0.04);
     border: 1px solid rgba(0,0,0,0.05);
     position: relative;
     overflow: hidden;
+}
+
+.start-card.has-image {
+    aspect-ratio: 9 / 16;
 }
 
 .start-card:hover {
