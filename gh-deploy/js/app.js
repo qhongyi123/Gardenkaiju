@@ -12,6 +12,9 @@ function switchTab(tabId) {
             btn.classList.add('active');
         }
     });
+    if (filterOpen) {
+        applyFilter();
+    }
 }
 
 function extractFilename(path) {
@@ -199,6 +202,95 @@ var FONT_MAP = {
     sans: "'Noto Sans SC', sans-serif",
     mashan: "'Ma Shan Zheng', cursive"
 };
+
+var currentFilterTag = null;
+var filterOpen = false;
+
+function toggleFilter() {
+    filterOpen = !filterOpen;
+    var panel = document.getElementById('filter-panel');
+    var trigger = document.getElementById('filter-trigger');
+    if (filterOpen) {
+        panel.classList.add('show');
+        trigger.classList.add('active');
+        buildTagCloud();
+        applyFilter();
+    } else {
+        panel.classList.remove('show');
+        trigger.classList.remove('active');
+        currentFilterTag = null;
+        document.getElementById('filter-search').value = '';
+        resetAllCards();
+    }
+}
+
+function buildTagCloud() {
+    var allCards = startCardsData.concat(submissionCardsData);
+    var tagMap = {};
+    allCards.forEach(function(card) {
+        if (card.tags && card.tags.length > 0) {
+            card.tags.forEach(function(tag) {
+                tagMap[tag] = (tagMap[tag] || 0) + 1;
+            });
+        }
+    });
+    var sorted = Object.keys(tagMap).sort(function(a, b) { return tagMap[b] - tagMap[a]; });
+
+    var container = document.getElementById('filter-tags');
+    var html = '';
+    sorted.forEach(function(tag) {
+        var active = (currentFilterTag === tag) ? ' active' : '';
+        html += '<span class="filter-tag-badge' + active + '" onclick="selectTag(\'' + escapeHtml(tag) + '\')">#' + escapeHtml(tag) + '<span class="tag-count">' + tagMap[tag] + '</span></span>';
+    });
+    container.innerHTML = html;
+}
+
+function selectTag(tag) {
+    if (currentFilterTag === tag) {
+        currentFilterTag = null;
+    } else {
+        currentFilterTag = tag;
+    }
+    buildTagCloud();
+    applyFilter();
+}
+
+function getActiveTabCards() {
+    var activeTab = document.querySelector('.tab-content.active');
+    if (activeTab && activeTab.id === 'tab3') return startCardsData;
+    if (activeTab && activeTab.id === 'tab4') return submissionCardsData;
+    return [];
+}
+
+function getActiveContainerId() {
+    var activeTab = document.querySelector('.tab-content.active');
+    if (activeTab && activeTab.id === 'tab3') return 'start-cards-grid';
+    if (activeTab && activeTab.id === 'tab4') return 'submission-cards-grid';
+    return null;
+}
+
+function applyFilter() {
+    if (!filterOpen) return;
+    var searchText = document.getElementById('filter-search').value.toLowerCase();
+    var dataArray = getActiveTabCards();
+    var containerId = getActiveContainerId();
+    if (!containerId || !dataArray.length) return;
+
+    var filtered = dataArray.filter(function(card) {
+        var matchTag = !currentFilterTag || (card.tags && card.tags.indexOf(currentFilterTag) >= 0);
+        var matchSearch = !searchText ||
+            (card._filename && card._filename.toLowerCase().indexOf(searchText) >= 0) ||
+            (card.content && card.content.toLowerCase().indexOf(searchText) >= 0);
+        return matchTag && matchSearch;
+    });
+
+    renderStartCards(containerId, filtered);
+}
+
+function resetAllCards() {
+    renderStartCards('start-cards-grid', startCardsData);
+    renderStartCards('submission-cards-grid', submissionCardsData);
+}
 
 function setFontSizeUI(n) {
     document.body.style.setProperty('--font-size-base', n + 'px');

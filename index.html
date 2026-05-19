@@ -11,6 +11,7 @@
 <div class="container">
     <div class="header">
         <h1>✨ 花园 ✨</h1>
+        <button class="filter-trigger" id="filter-trigger" onclick="toggleFilter()">🔍 筛选</button>
     </div>
 
     <div class="tabs-nav">
@@ -19,6 +20,14 @@
         <button class="tab-btn" onclick="switchTab('tab3')">开局</button>
         <button class="tab-btn" onclick="switchTab('tab4')">投稿开局</button>
         <button class="tab-btn" onclick="switchTab('tab5')">设置</button>
+    </div>
+
+    <div class="filter-panel" id="filter-panel">
+        <div class="filter-search-row">
+            <input type="text" id="filter-search" class="filter-search-input" placeholder="搜索开局名称或内容..." oninput="applyFilter()">
+            <button class="filter-close-btn" onclick="toggleFilter()">✕</button>
+        </div>
+        <div class="filter-tags-row" id="filter-tags"></div>
     </div>
 
     <div id="tab1" class="tab-content active">
