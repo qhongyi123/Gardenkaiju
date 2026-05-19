@@ -14,5 +14,6 @@ var SUBMISSION_CARDS_FILES = [
   'data/submissions/sub001-新芽.json',
   'data/submissions/sub002-教会见闻.json',
   'data/submissions/sub003-影子一夜.json',
-  'data/submissions/sub004-创园者日记.json'
+  'data/submissions/sub0035-枯萎教会大侵攻！跟我一起守营！.json',
+  'data/submissions/sub0036-枯萎教会大侵攻！是雏菊就防守一百天！.json'
 ];

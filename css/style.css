@@ -393,6 +393,26 @@ body {
     color: #666;
 }
 
+.modal-fav {
+    background: none;
+    border: none;
+    font-size: 1.6em;
+    cursor: pointer;
+    padding: 0;
+    line-height: 1;
+    opacity: 0.4;
+    transition: opacity 0.2s, transform 0.15s;
+}
+
+.modal-fav:hover {
+    opacity: 0.8;
+    transform: scale(1.15);
+}
+
+.modal-fav.favorited {
+    opacity: 1;
+}
+
 .modal-body {
     padding: 20px;
     overflow-y: auto;
@@ -741,4 +761,41 @@ body {
     background: var(--color-primary);
     color: white;
     border-color: var(--color-primary);
+}
+
+.fav-toggle {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 100;
+    padding: 8px 16px;
+    border-radius: 20px;
+    border: 1px solid var(--color-border);
+    background: var(--bg-card);
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-size: 0.9em;
+    color: var(--color-text-light);
+    box-shadow: 0 2px 12px rgba(0,0,0,0.08);
+    transition: all 0.2s;
+}
+
+.fav-toggle:hover {
+    border-color: var(--color-primary);
+    color: var(--color-primary-dark);
+    box-shadow: 0 4px 16px rgba(0,0,0,0.12);
+}
+
+.fav-toggle.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.fav-toggle .fav-count {
+    background: rgba(255,255,255,0.35);
+    border-radius: 10px;
+    padding: 1px 7px;
+    margin-left: 4px;
+    font-size: 0.8em;
 }

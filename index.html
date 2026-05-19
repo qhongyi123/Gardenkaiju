@@ -44,10 +44,12 @@
 
     <div id="tab3" class="tab-content">
         <div class="card-grid" id="start-cards-grid"></div>
+        <button class="fav-toggle" id="fav-toggle-starts" onclick="toggleFavoritesView('starts')">📁 收藏夹</button>
     </div>
 
     <div id="tab4" class="tab-content">
         <div class="card-grid" id="submission-cards-grid"></div>
+        <button class="fav-toggle" id="fav-toggle-subs" onclick="toggleFavoritesView('subs')">📁 收藏夹</button>
     </div>
 
     <div id="tab5" class="tab-content">
@@ -91,6 +93,7 @@
     <div class="modal-content">
         <div class="modal-header">
             <h3 id="modal-title">开局标题</h3>
+            <button class="modal-fav" id="modal-fav-btn" onclick="toggleFavoriteCard()">🌼</button>
             <button class="modal-close" onclick="closeModal('start-modal')">✕</button>
         </div>
         <div class="modal-body">

@@ -20,8 +20,15 @@ function switchTab(tabId) {
     if (!isCardTab && filterOpen) {
         closeFilter();
     }
-    if (isCardTab && filterOpen) {
-        applyFilter();
+    if (isCardTab) {
+        if (tabId === 'tab3') {
+            updateFavToggleCount('starts');
+            if (favModeStarts) refreshCurrentCards();
+        } else {
+            updateFavToggleCount('subs');
+            if (favModeSubs) refreshCurrentCards();
+        }
+        if (filterOpen) applyFilter();
     }
 }
 
@@ -128,6 +135,7 @@ function openModal(cardData) {
     previewEl.textContent = cardData.content || '暂无内容';
 
     document.getElementById('start-modal').classList.add('show');
+    updateFavButton();
 }
 
 function closeModal(modalId) {
@@ -234,7 +242,7 @@ function closeFilter() {
     document.getElementById('filter-trigger').classList.remove('active');
     currentFilterTag = null;
     document.getElementById('filter-search').value = '';
-    resetAllCards();
+    refreshCurrentCards();
 }
 
 function buildTagCloud() {
@@ -289,6 +297,15 @@ function applyFilter() {
     var containerId = getActiveContainerId();
     if (!containerId || !dataArray.length) return;
 
+    var activeTab = document.querySelector('.tab-content.active');
+    if (activeTab && activeTab.id === 'tab3' && favModeStarts) {
+        var favIds = getFavorites('starts');
+        dataArray = dataArray.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
+    } else if (activeTab && activeTab.id === 'tab4' && favModeSubs) {
+        var favIds = getFavorites('subs');
+        dataArray = dataArray.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
+    }
+
     var filtered = dataArray.filter(function(card) {
         var matchTag = !currentFilterTag || (card.tags && card.tags.indexOf(currentFilterTag) >= 0);
         var matchSearch = !searchText ||
@@ -303,6 +320,109 @@ function applyFilter() {
 function resetAllCards() {
     renderStartCards('start-cards-grid', startCardsData);
     renderStartCards('submission-cards-grid', submissionCardsData);
+}
+
+var favModeStarts = false;
+var favModeSubs = false;
+
+function getFavKey(type) {
+    return type === 'starts' ? 'garden-fav-starts' : 'garden-fav-subs';
+}
+
+function getFavorites(type) {
+    try {
+        return JSON.parse(localStorage.getItem(getFavKey(type)) || '[]');
+    } catch (e) { return []; }
+}
+
+function saveFavorites(type, arr) {
+    localStorage.setItem(getFavKey(type), JSON.stringify(arr));
+}
+
+function isFavorited(cardId, type) {
+    return getFavorites(type).indexOf(cardId) >= 0;
+}
+
+function toggleFavoriteCard() {
+    if (!currentCardData) return;
+    var activeTab = document.querySelector('.tab-content.active');
+    var type = (activeTab && activeTab.id === 'tab4') ? 'subs' : 'starts';
+    var favs = getFavorites(type);
+    var idx = favs.indexOf(currentCardData.id);
+    if (idx >= 0) {
+        favs.splice(idx, 1);
+    } else {
+        favs.push(currentCardData.id);
+    }
+    saveFavorites(type, favs);
+    updateFavButton();
+    updateFavToggleCount(type);
+    refreshCurrentCards();
+}
+
+function updateFavButton() {
+    if (!currentCardData) return;
+    var activeTab = document.querySelector('.tab-content.active');
+    var type = (activeTab && activeTab.id === 'tab4') ? 'subs' : 'starts';
+    var btn = document.getElementById('modal-fav-btn');
+    if (isFavorited(currentCardData.id, type)) {
+        btn.classList.add('favorited');
+    } else {
+        btn.classList.remove('favorited');
+    }
+}
+
+function updateFavToggleCount(type) {
+    var btn = document.getElementById('fav-toggle-' + type);
+    if (!btn) return;
+    var count = getFavorites(type).length;
+    var existing = btn.querySelector('.fav-count');
+    if (existing) existing.remove();
+    if (count > 0) {
+        var span = document.createElement('span');
+        span.className = 'fav-count';
+        span.textContent = count;
+        btn.appendChild(span);
+    }
+}
+
+function toggleFavoritesView(type) {
+    if (type === 'starts') {
+        favModeStarts = !favModeStarts;
+    } else {
+        favModeSubs = !favModeSubs;
+    }
+    var active = (type === 'starts') ? favModeStarts : favModeSubs;
+    var btn = document.getElementById('fav-toggle-' + type);
+    if (active) {
+        btn.classList.add('active');
+        btn.childNodes[0].textContent = '🌼 收藏中';
+    } else {
+        btn.classList.remove('active');
+        btn.childNodes[0].textContent = '📁 收藏夹';
+    }
+    updateFavToggleCount(type);
+    refreshCurrentCards();
+}
+
+function refreshCurrentCards() {
+    var activeTab = document.querySelector('.tab-content.active');
+    if (!activeTab) return;
+    if (activeTab.id === 'tab3') {
+        var data = startCardsData;
+        if (favModeStarts) {
+            var favIds = getFavorites('starts');
+            data = data.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
+        }
+        renderStartCards('start-cards-grid', data);
+    } else if (activeTab.id === 'tab4') {
+        var data = submissionCardsData;
+        if (favModeSubs) {
+            var favIds = getFavorites('subs');
+            data = data.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
+        }
+        renderStartCards('submission-cards-grid', data);
+    }
 }
 
 function setFontSizeUI(n) {
@@ -380,6 +500,8 @@ document.addEventListener('DOMContentLoaded', async function() {
     loadPreface();
     loadHistory();
     initSettings();
+    updateFavToggleCount('starts');
+    updateFavToggleCount('subs');
 });
 
 document.addEventListener('click', function(e) {
