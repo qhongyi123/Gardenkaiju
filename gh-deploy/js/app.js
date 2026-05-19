@@ -12,7 +12,15 @@ function switchTab(tabId) {
             btn.classList.add('active');
         }
     });
-    if (filterOpen) {
+
+    var isCardTab = (tabId === 'tab3' || tabId === 'tab4');
+    var trigger = document.getElementById('filter-trigger');
+    trigger.style.display = isCardTab ? '' : 'none';
+
+    if (!isCardTab && filterOpen) {
+        closeFilter();
+    }
+    if (isCardTab && filterOpen) {
         applyFilter();
     }
 }
@@ -216,12 +224,17 @@ function toggleFilter() {
         buildTagCloud();
         applyFilter();
     } else {
-        panel.classList.remove('show');
-        trigger.classList.remove('active');
-        currentFilterTag = null;
-        document.getElementById('filter-search').value = '';
-        resetAllCards();
+        closeFilter();
     }
+}
+
+function closeFilter() {
+    filterOpen = false;
+    document.getElementById('filter-panel').classList.remove('show');
+    document.getElementById('filter-trigger').classList.remove('active');
+    currentFilterTag = null;
+    document.getElementById('filter-search').value = '';
+    resetAllCards();
 }
 
 function buildTagCloud() {
