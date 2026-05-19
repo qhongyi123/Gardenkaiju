@@ -84,7 +84,7 @@ function renderStartCards(containerId, dataArray) {
 function openModal(cardData) {
     currentCardData = cardData;
 
-    document.getElementById('modal-title').textContent = cardData._filename || cardData.title || '未命名';
+    document.getElementById('modal-title').textContent = cardData._filename || '未命名';
 
     var authorEl = document.getElementById('modal-author');
     if (cardData.author) {
@@ -126,7 +126,7 @@ function closeModal(modalId) {
 function openViewStartModal() {
     if (!currentCardData) return;
 
-    document.getElementById('view-modal-title').textContent = currentCardData._filename || currentCardData.title || '未命名';
+    document.getElementById('view-modal-title').textContent = currentCardData._filename || '未命名';
     document.getElementById('view-full-content').textContent = currentCardData.content || '暂无内容';
 
     document.getElementById('view-start-modal').classList.add('show');
@@ -136,14 +136,13 @@ function sendStartContent() {
     if (!currentCardData) return;
 
     var rawContent = currentCardData.content_raw || currentCardData.content || '';
-    var title = currentCardData._filename || currentCardData.title || '未知开局';
-    var sendText = '【' + title + '】\n\n' + rawContent;
+    var sendText = rawContent;
 
     if (typeof triggerSlash !== 'undefined') {
         triggerSlash('/sendas name="花园巡防官" ' + sendText);
     } else {
         console.log('发送开局内容:', sendText);
-        alert('已尝试以花园巡防官名称发送开局内容。\n\n标题：' + title + '\n内容（前50字）：' + rawContent.substring(0, 50) + '...');
+        alert('已尝试以花园巡防官名称发送开局内容。\n\n内容（前50字）：' + rawContent.substring(0, 50) + '...');
     }
 }
 
