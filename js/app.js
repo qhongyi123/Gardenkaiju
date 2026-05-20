@@ -419,62 +419,6 @@ async function addCharacterEntry(ch, wbName) {
     var escapedContent = content.replace(/"/g, '\\"').replace(/\n/g, '\\n');
     executeSTCommand('/createentry file="' + wbName + '" key="' + entryName + '" "' + escapedContent + '"');
 }
-    var positionObj = { type: posType, order: posOrder };
-    if (posType === 'at_depth') { positionObj.role = posRole; positionObj.depth = posDepth; }
-
-    if (typeof apis.updateWB === 'function') {
-        try {
-            await apis.updateWB(wbName, function(entries) {
-                var entry = {
-                    name: entryName, enabled: true, content: content,
-                    strategy: { type: 'constant', keys: [entryName, ch._filename], keys_secondary: { logic: 'and_any', keys: [] }, scan_depth: 'same_as_global' },
-                    position: positionObj, probability: 100
-                };
-                var found = false;
-                for (var i = 0; i < entries.length; i++) {
-                    if (entries[i].name === entryName) { entries[i] = entry; found = true; break; }
-                }
-                if (!found) entries.push(entry);
-                return entries;
-            });
-            console.log('[花园] updateWB 完成:', ch._filename, '→', wbName);
-            return;
-        } catch(e) {
-            console.log('[花园] updateWB 失败, 尝试创建世界书:', e.message);
-            var ctx = getSTContext();
-            if (ctx && typeof ctx.executeSlashCommandsWithOptions === 'function') {
-                try { await ctx.executeSlashCommandsWithOptions('/createbook ' + wbName, { handleParserErrors: false }); } catch(e2) {}
-            }
-            await new Promise(function(r) { setTimeout(r, 1000); });
-            try {
-                await apis.updateWB(wbName, function(entries) {
-                    entries.push({
-                        name: entryName, enabled: true, content: content,
-                        strategy: { type: 'constant', keys: [entryName, ch._filename], keys_secondary: { logic: 'and_any', keys: [] }, scan_depth: 'same_as_global' },
-                        position: positionObj, probability: 100
-                    });
-                    return entries;
-                });
-                console.log('[花园] 重试 updateWB 完成:', ch._filename, '→', wbName);
-                return;
-            } catch(e2) { console.log('[花园] 重试也失败:', e2); }
-        }
-    }
-    var escapedContent = content.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-    var ctx = getSTContext();
-    if (ctx && typeof ctx.executeSlashCommandsWithOptions === 'function') {
-        try {
-            await ctx.executeSlashCommandsWithOptions('/createentry file="' + wbName + '" key="' + entryName + '" "' + escapedContent + '"', { handleParserErrors: false });
-            console.log('[花园] 斜杠命令已发送');
-            return;
-        } catch(e) {}
-    }
-    if (executeSTCommand('/createentry file="' + wbName + '" key="' + entryName + '" "' + escapedContent + '"')) {
-        console.log('[花园] 斜杠命令已发送');
-        return;
-    }
-    console.log('[花园] 无法写入世界书:', ch._filename);
-}
 
 async function loadStart() {
     sendStartContent();
