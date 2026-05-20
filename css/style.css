@@ -579,6 +579,12 @@ body {
     flex-direction: column;
 }
 
+#character-modal .modal-content {
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+}
+
 .view-content-scroll {
     flex: 1;
     overflow-y: auto;
@@ -874,4 +880,212 @@ body {
     padding: 1px 7px;
     margin-left: 4px;
     font-size: 0.8em;
+}
+
+/* ==================== 移动端适配 ==================== */
+
+@media (max-width: 768px) {
+    .container {
+        width: 100%;
+        max-width: 100vw;
+        height: 100vh;
+        max-height: 100vh;
+        border-radius: 0;
+        box-shadow: none;
+        border: none;
+    }
+    .container::before,
+    .container::after {
+        display: none;
+    }
+
+    .header {
+        flex-wrap: wrap;
+        padding: 8px 10px;
+        gap: 8px;
+        justify-content: flex-start;
+        min-height: 44px;
+    }
+    .header h1 {
+        font-size: 1.3em;
+        flex-basis: auto;
+    }
+    .header .filter-trigger {
+        position: static;
+        margin-left: auto;
+    }
+    .header #detail-edit-trigger {
+        position: static;
+    }
+
+    .tabs-nav {
+        padding: 3px;
+        gap: 0;
+    }
+    .tab-btn {
+        flex: 1;
+        padding: 8px 6px;
+        font-size: 0.85em;
+        min-width: 50px;
+        border-radius: 8px 8px 0 0;
+    }
+
+    .tab-content {
+        padding: 10px;
+        gap: 10px;
+    }
+    .tab-content.active {
+        gap: 10px;
+    }
+
+    .card-grid {
+        column-gap: 8px;
+    }
+    .start-card {
+        padding: 6px 8px;
+        margin-bottom: 8px;
+        min-height: 60px;
+    }
+    .start-card .card-filename {
+        font-size: 0.65em;
+    }
+
+    .settings-section {
+        padding: 12px;
+    }
+    .settings-row {
+        flex-wrap: wrap;
+        gap: 6px;
+    }
+    .col-btn {
+        width: 34px;
+        height: 34px;
+        font-size: 0.85em;
+    }
+    .font-btn {
+        padding: 4px 10px;
+        font-size: 0.8em;
+    }
+
+    #start-modal .modal-content {
+        width: 95%;
+        max-width: 100%;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    #view-start-modal .modal-content {
+        width: 98%;
+        height: 90vh;
+        border-radius: 12px;
+    }
+    #character-modal .modal-content {
+        width: 95%;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+
+    .modal-content {
+        margin: 8px;
+    }
+    .modal-header {
+        padding: 10px 12px;
+    }
+    .modal-body {
+        padding: 12px;
+    }
+    .modal-actions {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .modal-actions .btn {
+        width: 100%;
+    }
+
+    .filter-panel {
+        padding: 10px;
+    }
+    .filter-search-row {
+        gap: 6px;
+    }
+    .filter-tags-row {
+        gap: 4px;
+    }
+    .filter-tag-badge {
+        padding: 4px 8px;
+        font-size: 0.72em;
+    }
+
+    .fav-toggle {
+        bottom: 12px;
+        right: 12px;
+        padding: 6px 12px;
+        font-size: 0.8em;
+    }
+
+    .preface-section,
+    .history-content {
+        padding: 14px;
+        font-size: 0.9em;
+    }
+}
+
+@media (max-width: 420px) {
+    body {
+        padding: 0;
+    }
+
+    .header {
+        padding: 6px 8px;
+        gap: 4px;
+    }
+    .header h1 {
+        font-size: 1.1em;
+        width: 100%;
+        text-align: center;
+        order: 1;
+    }
+    .header .filter-trigger {
+        order: 2;
+        margin-left: 0;
+        font-size: 0.75em;
+        padding: 3px 8px;
+    }
+    .header #detail-edit-trigger {
+        order: 3;
+        font-size: 0.75em;
+        padding: 3px 8px;
+    }
+
+    .tab-btn {
+        padding: 6px 4px;
+        font-size: 0.72em;
+        min-width: 40px;
+    }
+
+    .card-grid {
+        column-count: 1;
+    }
+
+    .settings-row {
+        gap: 4px;
+    }
+    .col-btn {
+        width: 30px;
+        height: 30px;
+        font-size: 0.75em;
+    }
+    .wb-name-input {
+        width: 100%;
+    }
+
+    .modal-header h3 {
+        font-size: 1em;
+    }
+    .modal-close {
+        font-size: 1.2em;
+    }
+
+    .filter-search-input {
+        font-size: 0.8em;
+    }
 }
