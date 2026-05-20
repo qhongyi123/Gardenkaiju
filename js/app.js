@@ -266,11 +266,12 @@ async function bindWorldbookIfNeeded() {
 }
 
 function resolveHelperAPI() {
-    return {
-        createLorebook: typeof createLorebook === 'function' ? createLorebook : null,
-        createEntry: typeof createLorebookEntry === 'function' ? createLorebookEntry : null,
-        setEntries: typeof setLorebookEntries === 'function' ? setLorebookEntries : null
-    };
+    var createLB = typeof createLorebook === 'function' ? createLorebook : null;
+    var createEntry = typeof createLorebookEntry === 'function' ? createLorebookEntry : null;
+    var setEntries = typeof setLorebookEntries === 'function' ? setLorebookEntries : null;
+    var getLBs = typeof getLorebooks === 'function' ? getLorebooks : null;
+    console.log('[花园] 前端助手API: createLorebook=' + !!createLB + ' createEntry=' + !!createEntry + ' setEntries=' + !!setEntries + ' getLBs=' + !!getLBs);
+    return { createLorebook: createLB, createEntry: createEntry, setEntries: setEntries, getLorebooks: getLBs };
 }
 
 function resolveWorldbookAPI() {
@@ -294,13 +295,21 @@ async function ensureWorldbookCreated(wbName) {
     var helper = resolveHelperAPI();
     if (typeof helper.createLorebook === 'function') {
         try {
+            if (typeof helper.getLorebooks === 'function') {
+                var existing = await helper.getLorebooks();
+                if (existing && existing.indexOf(wbName) >= 0) {
+                    console.log('[花园] 世界书已存在:', wbName);
+                    return true;
+                }
+            }
             var ok = await helper.createLorebook(wbName);
-            if (ok) { console.log('[花园] 已创建世界书:', wbName); return true; }
-        } catch(e) { console.log('[花园] createLorebook 失败:', e); }
+            if (ok) { console.log('[花园] createLorebook 成功:', wbName); return true; }
+            console.log('[花园] createLorebook 返回 false:', wbName);
+        } catch(e) { console.log('[花园] createLorebook 异常:', e); }
     }
     var apis = resolveWorldbookAPI();
     if (typeof apis.getOrCreateWB === 'function') {
-        try { await apis.getOrCreateWB(wbName); console.log('[花园] getOrCreate 世界书:', wbName); return true; } catch(e) {}
+        try { await apis.getOrCreateWB(wbName); console.log('[花园] getOrCreate 完成:', wbName); return true; } catch(e) { console.log('[花园] getOrCreate 失败:', e); }
     }
     return false;
 }
@@ -506,7 +515,15 @@ async function createCharacterWorldbook() {
     closeModal('character-modal');
 
     var ok = await ensureWorldbookCreated(wbName);
-    if (!ok) { showToast('花园', '创建失败: ' + wbName); return; }
+    if (!ok) {
+        var helper = resolveHelperAPI();
+        if (typeof helper.createLorebook !== 'function') {
+            showToast('花园', '前端助手插件未安装，无法创建独立世界书。请在ST中安装"前端助手"插件。');
+        } else {
+            showToast('花园', '创建失败: ' + wbName);
+        }
+        return;
+    }
     await addCharacterEntry(currentCardData, wbName);
     showToast('花园', '世界书 "' + wbName + '" 已创建并写入角色 ' + currentCardData._filename);
 }
