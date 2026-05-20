@@ -352,6 +352,7 @@ body {
     z-index: 1000;
     align-items: center;
     justify-content: center;
+    overflow-y: auto;
 }
 
 .modal-overlay.show {
@@ -967,6 +968,11 @@ body {
         font-size: 0.8em;
     }
 
+    .modal-overlay {
+        align-items: flex-start;
+        padding: 5vh 0;
+    }
+
     #start-modal .modal-content {
         width: 95%;
         max-width: 100%;
@@ -985,7 +991,7 @@ body {
     }
 
     .modal-content {
-        margin: 8px;
+        margin: 0 auto;
     }
     .modal-header {
         padding: 10px 12px;
@@ -1076,6 +1082,10 @@ body {
     }
     .wb-name-input {
         width: 100%;
+    }
+
+    .modal-overlay {
+        padding: 3vh 0;
     }
 
     .modal-header h3 {
