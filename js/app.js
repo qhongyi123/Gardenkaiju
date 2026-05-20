@@ -258,11 +258,8 @@ async function bindWorldbookIfNeeded() {
     var ch = characterMap[currentCardData.character];
     if (!ch) return;
     var wbName = ch.worldbook || (ch._filename + '的世界书');
-    var apis = resolveWorldbookAPI();
-    if (typeof apis.getOrCreateWB === 'function') {
-        try { await apis.getOrCreateWB(wbName); } catch(e) {}
-    }
-    await new Promise(function(r) { setTimeout(r, 800); });
+    executeSTCommand('/getchatbook ' + wbName);
+    await new Promise(function(r) { setTimeout(r, 1000); });
     addCharacterEntry(ch);
     executeSTCommand('/world state=on ' + wbName);
     console.log('[花园] 已挂载角色世界书到全局:', wbName);
@@ -373,10 +370,8 @@ async function addCharacterEntry(ch, targetWbName) {
             return;
         } catch(e) {
             console.log('[花园] updateWB 失败, 尝试创建世界书:', e.message);
-            if (typeof apis.getOrCreateWB === 'function') {
-                try { await apis.getOrCreateWB(wbName); console.log('[花园] 已创建世界书:', wbName); } catch(e2) { console.log('[花园] 创建失败:', e2); }
-            }
-            await new Promise(function(r) { setTimeout(r, 800); });
+            executeSTCommand('/getchatbook ' + wbName);
+            await new Promise(function(r) { setTimeout(r, 1000); });
             try {
                 await apis.updateWB(wbName, function(entries) {
                     var entry = {
@@ -442,10 +437,8 @@ async function bindCharacterClear() {
     closeModal('character-modal');
 
     var apis = resolveWorldbookAPI();
-    if (typeof apis.getOrCreateWB === 'function') {
-        try { await apis.getOrCreateWB(wbName); console.log('[花园] 已创建世界书:', wbName); } catch(e) { console.log('[花园] 创建世界书失败:', e); }
-    }
-    await new Promise(function(r) { setTimeout(r, 800); });
+    executeSTCommand('/getchatbook ' + wbName);
+    await new Promise(function(r) { setTimeout(r, 1000); });
 
     if (typeof apis.updateWB === 'function') {
         try {
