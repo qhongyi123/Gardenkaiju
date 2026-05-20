@@ -522,6 +522,23 @@ body {
     accent-color: var(--color-primary);
 }
 
+.wb-name-input {
+    flex: 1;
+    padding: 6px 10px;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    font-family: var(--font-content);
+    font-size: 0.9em;
+    color: var(--color-text);
+    background: white;
+    outline: none;
+    transition: border-color 0.2s;
+}
+
+.wb-name-input:focus {
+    border-color: var(--color-primary);
+}
+
 #start-modal .modal-content {
     width: 90%;
     max-width: 600px;

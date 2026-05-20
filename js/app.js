@@ -202,6 +202,9 @@ function openCharacterModal(cardData) {
 
     document.getElementById('character-modal-preview').textContent = cardData.content || '暂无简介';
 
+    var wbInput = document.getElementById('character-wb-name');
+    wbInput.value = cardData.worldbook || '花园巡防官投稿角色';
+
     document.getElementById('character-modal').classList.add('show');
     updateCharacterFavButton();
 }
@@ -255,12 +258,24 @@ async function getCurrentWorldbookName() {
     return 'current';
 }
 
-async function addCharacterEntry(ch) {
+async function getOrCreateWorldbook(wbName) {
+    var apis = resolveWorldbookAPI();
+    if (typeof apis.getOrCreateWB === 'function') {
+        return await apis.getOrCreateWB(wbName);
+    }
+    if (typeof triggerSlash !== 'undefined') {
+        triggerSlash('/createbook ' + wbName);
+        return wbName;
+    }
+    return wbName;
+}
+
+async function addCharacterEntry(ch, targetWbName) {
     var apis = resolveWorldbookAPI();
     var entryName = '[花园角色]' + ch._filename;
 
     if (typeof apis.updateWB === 'function') {
-        var wbName = await getCurrentWorldbookName();
+        var wbName = targetWbName || await getCurrentWorldbookName();
         await apis.updateWB(wbName, function(entries) {
             var found = false;
             for (var i = 0; i < entries.length; i++) {
@@ -273,13 +288,14 @@ async function addCharacterEntry(ch) {
             if (!found) entries.push(buildCharacterEntry(ch, entryName));
             return entries;
         });
-        console.log('[花园] 已绑定角色到世界书:', ch._filename);
+        console.log('[花园] 已绑定角色到世界书:', ch._filename, '→', wbName);
         return;
     }
 
     if (typeof triggerSlash !== 'undefined') {
         var content = (ch.content || ch._filename || '').replace(/"/g, '\\"').replace(/\n/g, '\\n');
-        triggerSlash('/createentry file="' + (ch.worldbook || '花园角色库') + '" key="' + entryName + '" "' + content + '"');
+        var wbName = targetWbName || (ch.worldbook || '花园巡防官投稿角色');
+        triggerSlash('/createentry file="' + wbName + '" key="' + entryName + '" "' + content + '"');
         console.log('[花园] 已通过斜杠命令添加角色:', ch._filename);
         return;
     }
@@ -320,17 +336,18 @@ function updateBindWorldbook() {
 
 async function bindCharacterClear() {
     if (!currentCardData) return;
+    var wbName = document.getElementById('character-wb-name').value.trim() || '花园巡防官投稿角色';
     closeModal('character-modal');
+    await getOrCreateWorldbook(wbName);
     var apis = resolveWorldbookAPI();
     if (typeof apis.updateWB === 'function') {
-        var wbName = await getCurrentWorldbookName();
         await apis.updateWB(wbName, function(entries) {
             return entries.filter(function(e) {
                 return !(e.name && e.name.indexOf('[花园角色]') === 0);
             });
         });
     }
-    addCharacterEntry(currentCardData);
+    await addCharacterEntry(currentCardData, wbName);
 }
 
 async function addCharacterToExtra() {
