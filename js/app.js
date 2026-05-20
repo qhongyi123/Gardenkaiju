@@ -234,17 +234,59 @@ function bindWorldbookIfNeeded() {
     if (!bindWorldbook) return;
     var ch = characterMap[currentCardData.character];
     if (!ch || !ch.worldbook) return;
-    activateWorldbook(ch.worldbook);
+    addCharacterEntry(ch);
+}
+
+function addCharacterEntry(ch) {
+    var updateWB = window.parent && window.parent.updateWorldbookWith;
+    if (typeof updateWB !== 'function') {
+        console.log('[花园] 非ST环境，已选择角色:', ch._filename);
+        return;
+    }
+    updateWB('current', function(entries) {
+        var entryName = '[花园角色]' + ch._filename;
+        var found = false;
+        for (var i = 0; i < entries.length; i++) {
+            if (entries[i].name === entryName) {
+                entries[i] = buildCharacterEntry(ch, entryName);
+                found = true;
+                break;
+            }
+        }
+        if (!found) entries.push(buildCharacterEntry(ch, entryName));
+        return entries;
+    });
+    console.log('[花园] 已绑定角色到世界书:', ch._filename);
+}
+
+function buildCharacterEntry(ch, entryName) {
+    return {
+        name: entryName,
+        enabled: true,
+        content: ch.content || '',
+        strategy: {
+            type: 'constant',
+            keys: [entryName, ch._filename],
+            keys_secondary: { logic: 'and_any', keys: [] },
+            scan_depth: 'same_as_global'
+        },
+        position: { type: 'at_depth', role: 'system', depth: 4, order: 100 },
+        probability: 100
+    };
 }
 
 function activateWorldbook(wbName) {
-    var ctx = window.parent.SillyTavern && window.parent.SillyTavern.getContext && window.parent.SillyTavern.getContext();
-    if (ctx && ctx.executeSlashCommandsWithOptions) {
-        ctx.executeSlashCommandsWithOptions('/worldbook name="' + wbName + '" state=on', { handleParserErrors: false });
-        console.log('[花园] 已激活世界书:', wbName);
-    } else {
-        console.log('[花园] 已选择世界书 (非ST环境):', wbName);
+    var updateWB = window.parent && window.parent.updateWorldbookWith;
+    if (typeof updateWB !== 'function') {
+        console.log('[花园] 非ST环境，已选择世界书:', wbName);
+        return;
     }
+    updateWB('current', function(entries) {
+        return entries.filter(function(e) {
+            return e.name && e.name.indexOf('[花园角色]') !== -1;
+        });
+    });
+    console.log('[花园] 已清空角色条目');
 }
 
 function loadStart() {
@@ -263,24 +305,25 @@ function updateBindWorldbook() {
 }
 
 function bindCharacterClear() {
-    if (!currentCardData || !currentCardData.worldbook) return;
+    if (!currentCardData) return;
     closeModal('character-modal');
-    activateWorldbook(currentCardData.worldbook);
+    var updateWB = window.parent && window.parent.updateWorldbookWith;
+    if (typeof updateWB !== 'function') {
+        console.log('[花园] 非ST环境，已选择角色:', currentCardData._filename);
+        return;
+    }
+    updateWB('current', function(entries) {
+        return entries.filter(function(e) {
+            return !(e.name && e.name.indexOf('[花园角色]') === 0);
+        });
+    });
+    addCharacterEntry(currentCardData);
 }
 
 function addCharacterToExtra() {
     if (!currentCardData) return;
-    var ctx = window.parent.SillyTavern && window.parent.SillyTavern.getContext && window.parent.SillyTavern.getContext();
-    if (ctx && ctx.executeSlashCommandsWithOptions) {
-        var content = currentCardData.content || currentCardData._filename || '';
-        content = content.replace(/"/g, '\\"').replace(/\n/g, '\\n');
-        var wbName = currentCardData.worldbook || currentCardData._filename;
-        ctx.executeSlashCommandsWithOptions('/createentry file="' + wbName + '" key="' + currentCardData._filename + '" "' + content + '"', { handleParserErrors: false });
-        console.log('[花园] 已添加角色到世界书:', currentCardData._filename);
-    } else {
-        console.log('[花园] 已选择添加角色 (非ST环境):', currentCardData._filename);
-    }
     closeModal('character-modal');
+    addCharacterEntry(currentCardData);
 }
 
 function escapeHtml(str) {
@@ -481,7 +524,9 @@ function isFavorited(cardId, type) {
 function toggleFavoriteCard() {
     if (!currentCardData) return;
     var activeTab = document.querySelector('.tab-content.active');
-    var type = (activeTab && activeTab.id === 'tab4') ? 'subs' : 'starts';
+    var type = 'starts';
+    if (activeTab && activeTab.id === 'tab4') type = 'subs';
+    if (activeTab && activeTab.id === 'tab6') type = 'chars';
     var favs = getFavorites(type);
     var idx = favs.indexOf(currentCardData.id);
     if (idx >= 0) {
@@ -495,12 +540,39 @@ function toggleFavoriteCard() {
     refreshCurrentCards();
 }
 
+function toggleFavoriteCharacter() {
+    if (!currentCardData) return;
+    var favs = getFavorites('chars');
+    var idx = favs.indexOf(currentCardData.id);
+    if (idx >= 0) {
+        favs.splice(idx, 1);
+    } else {
+        favs.push(currentCardData.id);
+    }
+    saveFavorites('chars', favs);
+    updateCharacterFavButton();
+    updateFavToggleCount('chars');
+    refreshCurrentCards();
+}
+
 function updateFavButton() {
     if (!currentCardData) return;
     var activeTab = document.querySelector('.tab-content.active');
-    var type = (activeTab && activeTab.id === 'tab4') ? 'subs' : 'starts';
+    var type = 'starts';
+    if (activeTab && activeTab.id === 'tab4') type = 'subs';
+    if (activeTab && activeTab.id === 'tab6') type = 'chars';
     var btn = document.getElementById('modal-fav-btn');
     if (isFavorited(currentCardData.id, type)) {
+        btn.classList.add('favorited');
+    } else {
+        btn.classList.remove('favorited');
+    }
+}
+
+function updateCharacterFavButton() {
+    if (!currentCardData) return;
+    var btn = document.getElementById('character-modal-fav-btn');
+    if (isFavorited(currentCardData.id, 'chars')) {
         btn.classList.add('favorited');
     } else {
         btn.classList.remove('favorited');
