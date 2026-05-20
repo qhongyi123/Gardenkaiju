@@ -103,6 +103,11 @@ body {
     right: 15px;
 }
 
+.header #detail-edit-trigger {
+    position: absolute;
+    right: 85px;
+}
+
 .tabs-nav {
     display: flex;
     background: #f1f8f1;
