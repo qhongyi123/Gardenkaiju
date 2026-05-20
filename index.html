@@ -12,6 +12,7 @@
     <div class="header">
         <h1>✨ 花园 ✨</h1>
         <button class="filter-trigger" id="filter-trigger" onclick="toggleFilter()" style="display:none">🔍 筛选</button>
+        <button class="filter-trigger" id="detail-edit-trigger" onclick="toggleDetailEdit()" style="display:none">📝 细致编辑</button>
     </div>
 
     <div class="tabs-nav">
@@ -170,8 +171,37 @@
             <div class="modal-section-title">📋 角色简介</div>
             <div class="modal-preview" id="character-modal-preview"></div>
             <div class="settings-row" id="character-wb-name-row">
-                <span class="settings-label">世界书名称：</span>
-                <input type="text" id="character-wb-name" class="wb-name-input" value="花园巡防官投稿角色" placeholder="输入世界书名称">
+                <span class="settings-label">世界书名称（选填）：</span>
+                <input type="text" id="character-wb-name" class="wb-name-input" value="" placeholder="留空则使用默认名称">
+            </div>
+            <div id="character-detail-edit" style="display:none">
+                <div class="modal-section-title">📝 细致编辑</div>
+                <div class="settings-row">
+                    <span class="settings-label">位置：</span>
+                    <select id="detail-position-type" class="wb-select" onchange="toggleDepthFields()">
+                        <option value="before_char">角色定义前</option>
+                        <option value="after_char">角色定义后</option>
+                        <option value="at_depth">系统提示中</option>
+                    </select>
+                </div>
+                <div id="detail-depth-fields">
+                    <div class="settings-row">
+                        <span class="settings-label">角色：</span>
+                        <select id="detail-role" class="wb-select">
+                            <option value="system">system</option>
+                            <option value="assistant">assistant</option>
+                            <option value="user">user</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">深度：</span>
+                        <input type="number" id="detail-depth" class="wb-name-input" value="4" min="0" max="99" style="width:60px">
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label">顺序：</span>
+                    <input type="number" id="detail-order" class="wb-name-input" value="100" min="0" max="9999" style="width:80px">
+                </div>
             </div>
             <div class="modal-actions">
                 <button class="btn btn-success" onclick="mountCharacterGlobal()">🌐 挂载到全局</button>

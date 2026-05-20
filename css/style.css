@@ -539,6 +539,23 @@ body {
     border-color: var(--color-primary);
 }
 
+.wb-select {
+    padding: 6px 10px;
+    border: 2px solid var(--color-border);
+    border-radius: 8px;
+    font-family: var(--font-content);
+    font-size: 0.9em;
+    color: var(--color-text);
+    background: white;
+    outline: none;
+}
+
+#detail-edit-trigger.active {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
 #start-modal .modal-content {
     width: 90%;
     max-width: 600px;

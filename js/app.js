@@ -4,6 +4,7 @@ var characterCardsData = [];
 var characterMap = {};
 var currentCardData = null;
 var bindWorldbook = true;
+var detailEditMode = false;
 
 function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(function(tab) { tab.classList.remove('active'); });
@@ -19,6 +20,12 @@ function switchTab(tabId) {
     var isCardTab = (tabId === 'tab3' || tabId === 'tab4' || tabId === 'tab6');
     var trigger = document.getElementById('filter-trigger');
     trigger.style.display = isCardTab ? '' : 'none';
+    var detailTrigger = document.getElementById('detail-edit-trigger');
+    detailTrigger.style.display = (tabId === 'tab6') ? '' : 'none';
+    if (tabId !== 'tab6' && detailEditMode) {
+        detailEditMode = false;
+        detailTrigger.classList.remove('active');
+    }
 
     if (!isCardTab && filterOpen) {
         closeFilter();
@@ -203,7 +210,20 @@ function openCharacterModal(cardData) {
     document.getElementById('character-modal-preview').textContent = cardData.content || '暂无简介';
 
     var wbInput = document.getElementById('character-wb-name');
-    wbInput.value = cardData.worldbook || '花园巡防官投稿角色';
+    wbInput.value = cardData.worldbook || '';
+
+    var detailSection = document.getElementById('character-detail-edit');
+    if (detailEditMode) {
+        detailSection.style.display = '';
+        var posType = (cardData.position && cardData.position.type) || 'before_char';
+        document.getElementById('detail-position-type').value = posType;
+        document.getElementById('detail-role').value = (cardData.position && cardData.position.role) || 'system';
+        document.getElementById('detail-depth').value = (cardData.position && cardData.position.depth) || 4;
+        document.getElementById('detail-order').value = (cardData.position && cardData.position.order) || 100;
+        document.getElementById('detail-depth-fields').style.display = (posType === 'at_depth') ? '' : 'none';
+    } else {
+        detailSection.style.display = 'none';
+    }
 
     document.getElementById('character-modal').classList.add('show');
     updateCharacterFavButton();
@@ -238,6 +258,9 @@ function bindWorldbookIfNeeded() {
     var ch = characterMap[currentCardData.character];
     if (!ch) return;
     addCharacterEntry(ch);
+    var wbName = ch.worldbook || '花园巡防官投稿角色';
+    executeSTCommand('/world state=on ' + wbName);
+    console.log('[花园] 已挂载角色世界书到全局:', wbName);
 }
 
 function resolveWorldbookAPI() {
@@ -308,13 +331,30 @@ async function addCharacterEntry(ch, targetWbName) {
 
     var content = ch.content || ch._filename;
 
+    var posType = (ch.position && ch.position.type) || 'before_char';
+    var posRole = (ch.position && ch.position.role) || 'system';
+    var posDepth = (ch.position && ch.position.depth) || 4;
+    var posOrder = (ch.position && ch.position.order) || 100;
+    if (detailEditMode) {
+        posType = document.getElementById('detail-position-type').value || 'before_char';
+        posRole = document.getElementById('detail-role').value || 'system';
+        posDepth = parseInt(document.getElementById('detail-depth').value) || 4;
+        posOrder = parseInt(document.getElementById('detail-order').value) || 100;
+    }
+
+    var positionObj = { type: posType, order: posOrder };
+    if (posType === 'at_depth') {
+        positionObj.role = posRole;
+        positionObj.depth = posDepth;
+    }
+
     if (typeof apis.updateWB === 'function') {
         try {
             await apis.updateWB(wbName, function(entries) {
                 var entry = {
                     name: entryName, enabled: true, content: content,
                     strategy: { type: 'constant', keys: [entryName, ch._filename], keys_secondary: { logic: 'and_any', keys: [] }, scan_depth: 'same_as_global' },
-                    position: { type: 'at_depth', role: 'system', depth: 4, order: 100 },
+                    position: positionObj,
                     probability: 100
                 };
                 var found = false;
@@ -335,7 +375,7 @@ async function addCharacterEntry(ch, targetWbName) {
                     var entry = {
                         name: entryName, enabled: true, content: content,
                         strategy: { type: 'constant', keys: [entryName, ch._filename], keys_secondary: { logic: 'and_any', keys: [] }, scan_depth: 'same_as_global' },
-                        position: { type: 'at_depth', role: 'system', depth: 4, order: 100 },
+                        position: positionObj,
                         probability: 100
                     };
                     entries.push(entry);
@@ -369,6 +409,22 @@ function loadStartFromView() {
 
 function updateBindWorldbook() {
     bindWorldbook = document.getElementById('modal-bind-worldbook').checked;
+}
+
+function toggleDetailEdit() {
+    detailEditMode = !detailEditMode;
+    var btn = document.getElementById('detail-edit-trigger');
+    if (detailEditMode) {
+        btn.classList.add('active');
+    } else {
+        btn.classList.remove('active');
+    }
+}
+
+function toggleDepthFields() {
+    var type = document.getElementById('detail-position-type').value;
+    var div = document.getElementById('detail-depth-fields');
+    div.style.display = (type === 'at_depth') ? '' : 'none';
 }
 
 async function bindCharacterClear() {
