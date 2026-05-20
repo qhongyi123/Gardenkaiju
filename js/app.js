@@ -262,6 +262,27 @@ function updateBindWorldbook() {
     bindWorldbook = document.getElementById('modal-bind-worldbook').checked;
 }
 
+function bindCharacterClear() {
+    if (!currentCardData || !currentCardData.worldbook) return;
+    closeModal('character-modal');
+    activateWorldbook(currentCardData.worldbook);
+}
+
+function addCharacterToExtra() {
+    if (!currentCardData) return;
+    var ctx = window.parent.SillyTavern && window.parent.SillyTavern.getContext && window.parent.SillyTavern.getContext();
+    if (ctx && ctx.executeSlashCommandsWithOptions) {
+        var content = currentCardData.content || currentCardData._filename || '';
+        content = content.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+        var wbName = currentCardData.worldbook || currentCardData._filename;
+        ctx.executeSlashCommandsWithOptions('/createentry file="' + wbName + '" key="' + currentCardData._filename + '" "' + content + '"', { handleParserErrors: false });
+        console.log('[花园] 已添加角色到世界书:', currentCardData._filename);
+    } else {
+        console.log('[花园] 已选择添加角色 (非ST环境):', currentCardData._filename);
+    }
+    closeModal('character-modal');
+}
+
 function escapeHtml(str) {
     var div = document.createElement('div');
     div.textContent = str;
@@ -431,64 +452,6 @@ function resetAllCards() {
     renderStartCards('start-cards-grid', startCardsData);
     renderStartCards('submission-cards-grid', submissionCardsData);
     renderStartCards('character-cards-grid', characterCardsData);
-}
-
-function toggleFavoriteCard() {
-    if (!currentCardData) return;
-    var activeTab = document.querySelector('.tab-content.active');
-    var type = 'starts';
-    if (activeTab && activeTab.id === 'tab4') type = 'subs';
-    if (activeTab && activeTab.id === 'tab6') type = 'chars';
-    var favs = getFavorites(type);
-    var idx = favs.indexOf(currentCardData.id);
-    if (idx >= 0) {
-        favs.splice(idx, 1);
-    } else {
-        favs.push(currentCardData.id);
-    }
-    saveFavorites(type, favs);
-    updateFavButton();
-    updateFavToggleCount(type);
-    refreshCurrentCards();
-}
-
-function toggleFavoriteCharacter() {
-    if (!currentCardData) return;
-    var favs = getFavorites('chars');
-    var idx = favs.indexOf(currentCardData.id);
-    if (idx >= 0) {
-        favs.splice(idx, 1);
-    } else {
-        favs.push(currentCardData.id);
-    }
-    saveFavorites('chars', favs);
-    updateCharacterFavButton();
-    updateFavToggleCount('chars');
-    refreshCurrentCards();
-}
-
-function updateFavButton() {
-    if (!currentCardData) return;
-    var activeTab = document.querySelector('.tab-content.active');
-    var type = 'starts';
-    if (activeTab && activeTab.id === 'tab4') type = 'subs';
-    if (activeTab && activeTab.id === 'tab6') type = 'chars';
-    var btn = document.getElementById('modal-fav-btn');
-    if (isFavorited(currentCardData.id, type)) {
-        btn.classList.add('favorited');
-    } else {
-        btn.classList.remove('favorited');
-    }
-}
-
-function updateCharacterFavButton() {
-    if (!currentCardData) return;
-    var btn = document.getElementById('character-modal-fav-btn');
-    if (isFavorited(currentCardData.id, 'chars')) {
-        btn.classList.add('favorited');
-    } else {
-        btn.classList.remove('favorited');
-    }
 }
 
 var favModeStarts = false;
