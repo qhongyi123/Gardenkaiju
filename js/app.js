@@ -258,25 +258,27 @@ async function bindWorldbookIfNeeded() {
     var ch = characterMap[currentCardData.character];
     if (!ch) return;
     var wbName = ch.worldbook || (ch._filename + '的世界书');
+    var ok = await ensureWorldbookCreated(wbName);
+    if (!ok) { showToast('花园', '世界书创建失败: ' + wbName); return; }
     await addCharacterEntry(ch, wbName);
-    var ctx = getSTContext();
-    if (ctx && typeof ctx.executeSlashCommandsWithOptions === 'function') {
-        try { await ctx.executeSlashCommandsWithOptions('/world state=on ' + wbName, { handleParserErrors: false }); } catch(e) {}
-    } else {
-        executeSTCommand('/world state=on ' + wbName);
-    }
-    console.log('[花园] 已挂载角色到全局:', ch._filename);
-    showToast('花园', '角色 ' + ch._filename + ' 已创建并挂载到全局');
+    globallyActivate(wbName);
+    showToast('花园', ch._filename + ' 已创建并挂载到全局');
+}
+
+function resolveHelperAPI() {
+    return {
+        createLorebook: typeof createLorebook === 'function' ? createLorebook : null,
+        createEntry: typeof createLorebookEntry === 'function' ? createLorebookEntry : null,
+        setEntries: typeof setLorebookEntries === 'function' ? setLorebookEntries : null
+    };
 }
 
 function resolveWorldbookAPI() {
     var result = { updateWB: null, getOrCreateWB: null };
     if (typeof updateWorldbookWith === 'function') result.updateWB = updateWorldbookWith;
+    if (!result.updateWB) { try { if (window.parent && typeof window.parent.updateWorldbookWith === 'function') result.updateWB = window.parent.updateWorldbookWith; } catch(e) {} }
     if (typeof getOrCreateChatWorldbook === 'function') result.getOrCreateWB = getOrCreateChatWorldbook;
     if (typeof getOrCreateChatLorebook === 'function' && !result.getOrCreateWB) result.getOrCreateWB = getOrCreateChatLorebook;
-    if (!result.updateWB) {
-        try { if (window.parent && typeof window.parent.updateWorldbookWith === 'function') result.updateWB = window.parent.updateWorldbookWith; } catch(e) {}
-    }
     if (!result.getOrCreateWB) {
         try {
             if (window.parent) {
@@ -288,13 +290,33 @@ function resolveWorldbookAPI() {
     return result;
 }
 
+async function ensureWorldbookCreated(wbName) {
+    var helper = resolveHelperAPI();
+    if (typeof helper.createLorebook === 'function') {
+        try {
+            var ok = await helper.createLorebook(wbName);
+            if (ok) { console.log('[花园] 已创建世界书:', wbName); return true; }
+        } catch(e) { console.log('[花园] createLorebook 失败:', e); }
+    }
+    var apis = resolveWorldbookAPI();
+    if (typeof apis.getOrCreateWB === 'function') {
+        try { await apis.getOrCreateWB(wbName); console.log('[花园] getOrCreate 世界书:', wbName); return true; } catch(e) {}
+    }
+    return false;
+}
+
+function globallyActivate(wbName) {
+    var ctx = getSTContext();
+    if (ctx && typeof ctx.executeSlashCommandsWithOptions === 'function') {
+        try { ctx.executeSlashCommandsWithOptions('/world state=on ' + wbName, { handleParserErrors: false }); return; } catch(e) {}
+    }
+    executeSTCommand('/world state=on ' + wbName);
+}
+
 async function getCurrentWorldbookName() {
     var apis = resolveWorldbookAPI();
     if (typeof apis.getOrCreateWB === 'function') {
-        try {
-            var name = await apis.getOrCreateWB('current');
-            if (name) return name;
-        } catch(e) {}
+        try { var name = await apis.getOrCreateWB('current'); if (name) return name; } catch(e) {}
     }
     return 'current';
 }
@@ -329,10 +351,7 @@ function showToast(title, text) {
 }
 
 async function addCharacterEntry(ch, wbName) {
-    var apis = resolveWorldbookAPI();
     var entryName = '[花园角色]' + ch._filename;
-    console.log('[花园] 添加角色条目:', entryName, '→', wbName);
-
     var content = ch.content || ch._filename;
     var posType = (ch.position && ch.position.type) || 'before_char';
     var posRole = (ch.position && ch.position.role) || 'system';
@@ -344,6 +363,53 @@ async function addCharacterEntry(ch, wbName) {
         posDepth = parseInt(document.getElementById('detail-depth').value) || 4;
         posOrder = parseInt(document.getElementById('detail-order').value) || 100;
     }
+    console.log('[花园] 添加角色条目:', entryName, '→', wbName);
+
+    var helper = resolveHelperAPI();
+    if (typeof helper.createEntry === 'function') {
+        try {
+            await helper.createEntry(wbName, {
+                comment: entryName,
+                content: content,
+                key: [entryName, ch._filename],
+                enabled: true,
+                type: 'constant',
+                order: posOrder,
+                position: posType === 'at_depth' ? 'at_depth' : (posType === 'after_char' ? 'after_char' : 'before_char'),
+                depth: posType === 'at_depth' ? posDepth : undefined,
+                role: posType === 'at_depth' ? posRole : undefined
+            });
+            console.log('[花园] createLorebookEntry 完成:', ch._filename);
+            return;
+        } catch(e) { console.log('[花园] createLorebookEntry 失败:', e); }
+    }
+
+    var apis = resolveWorldbookAPI();
+    if (typeof apis.updateWB === 'function') {
+        var positionObj = { type: posType, order: posOrder };
+        if (posType === 'at_depth') { positionObj.role = posRole; positionObj.depth = posDepth; }
+        try {
+            await apis.updateWB(wbName, function(entries) {
+                var entry = {
+                    name: entryName, enabled: true, content: content,
+                    strategy: { type: 'constant', keys: [entryName, ch._filename], keys_secondary: { logic: 'and_any', keys: [] }, scan_depth: 'same_as_global' },
+                    position: positionObj, probability: 100
+                };
+                var found = false;
+                for (var i = 0; i < entries.length; i++) {
+                    if (entries[i].name === entryName) { entries[i] = entry; found = true; break; }
+                }
+                if (!found) entries.push(entry);
+                return entries;
+            });
+            console.log('[花园] updateWB 完成:', ch._filename);
+            return;
+        } catch(e) { console.log('[花园] updateWB 失败:', e); }
+    }
+
+    var escapedContent = content.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+    executeSTCommand('/createentry file="' + wbName + '" key="' + entryName + '" "' + escapedContent + '"');
+}
     var positionObj = { type: posType, order: posOrder };
     if (posType === 'at_depth') { positionObj.role = posRole; positionObj.depth = posDepth; }
 
@@ -439,19 +505,10 @@ async function createCharacterWorldbook() {
     console.log('[花园] 创建世界书:', wbName, '角色:', currentCardData._filename);
     closeModal('character-modal');
 
-    var apis = resolveWorldbookAPI();
-    if (typeof apis.updateWB === 'function') {
-        try {
-            await apis.updateWB(wbName, function(entries) {
-                return entries.filter(function(e) {
-                    return !(e.name && e.name.indexOf('[花园角色]') === 0);
-                });
-            });
-            console.log('[花园] 已清空旧角色条目');
-        } catch(e) { console.log('[花园] 清空条目失败:', e); }
-    }
+    var ok = await ensureWorldbookCreated(wbName);
+    if (!ok) { showToast('花园', '创建失败: ' + wbName); return; }
     await addCharacterEntry(currentCardData, wbName);
-    showToast('花园', '世界书 ' + wbName + ' 创建完成');
+    showToast('花园', '世界书 "' + wbName + '" 已创建并写入角色 ' + currentCardData._filename);
 }
 
 async function mountCharacterGlobal() {
@@ -460,15 +517,8 @@ async function mountCharacterGlobal() {
     if (!wbName) { wbName = currentCardData.worldbook || (currentCardData._filename + '的世界书'); }
     console.log('[花园] 挂载到全局:', wbName);
     closeModal('character-modal');
-
-    var ctx = getSTContext();
-    if (ctx && typeof ctx.executeSlashCommandsWithOptions === 'function') {
-        try { await ctx.executeSlashCommandsWithOptions('/world state=on ' + wbName, { handleParserErrors: false }); } catch(e) {}
-    } else {
-        executeSTCommand('/world state=on ' + wbName);
-    }
-    console.log('[花园] 已挂载到全局:', wbName);
-    showToast('花园', '世界书 ' + wbName + ' 已挂载到全局');
+    globallyActivate(wbName);
+    showToast('花园', '世界书 "' + wbName + '" 已挂载到全局');
 }
 
 async function addCharacterToExtra() {
@@ -476,6 +526,7 @@ async function addCharacterToExtra() {
     closeModal('character-modal');
     var wbName = await getCurrentWorldbookName();
     await addCharacterEntry(currentCardData, wbName);
+    showToast('花园', currentCardData._filename + ' 已加入当前世界书');
 }
 
 function escapeHtml(str) {
