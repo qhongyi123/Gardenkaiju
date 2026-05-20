@@ -252,14 +252,15 @@ function sendStartContent() {
     }
 }
 
-function bindWorldbookIfNeeded() {
+async function bindWorldbookIfNeeded() {
     if (!currentCardData || !currentCardData.character) return;
     if (!bindWorldbook) return;
     var ch = characterMap[currentCardData.character];
     if (!ch) return;
-    addCharacterEntry(ch);
-    var wbName = ch.worldbook || '花园巡防官投稿角色';
+    var wbName = ch.worldbook || (ch._filename + '的世界书');
     executeSTCommand('/world state=on ' + wbName);
+    await new Promise(function(r) { setTimeout(r, 800); });
+    addCharacterEntry(ch);
     console.log('[花园] 已挂载角色世界书到全局:', wbName);
 }
 
@@ -396,14 +397,14 @@ async function addCharacterEntry(ch, targetWbName) {
     console.log('[花园] 无法写入世界书:', ch._filename);
 }
 
-function loadStart() {
+async function loadStart() {
     sendStartContent();
-    bindWorldbookIfNeeded();
+    await bindWorldbookIfNeeded();
 }
 
-function loadStartFromView() {
+async function loadStartFromView() {
     sendStartContent();
-    bindWorldbookIfNeeded();
+    await bindWorldbookIfNeeded();
     closeModal('view-start-modal');
 }
 
@@ -429,9 +430,13 @@ function toggleDepthFields() {
 
 async function bindCharacterClear() {
     if (!currentCardData) { console.log('[花园] mountCharacterGlobal: currentCardData 为空'); return; }
-    var wbName = document.getElementById('character-wb-name').value.trim() || '花园巡防官投稿角色';
+    var wbName = document.getElementById('character-wb-name').value.trim();
+    if (!wbName) { wbName = currentCardData.worldbook || (currentCardData._filename + '的世界书'); }
     console.log('[花园] 挂载到全局, 世界书:', wbName, '角色:', currentCardData._filename);
     closeModal('character-modal');
+
+    executeSTCommand('/world state=on ' + wbName);
+    await new Promise(function(r) { setTimeout(r, 800); });
 
     var apis = resolveWorldbookAPI();
     if (typeof apis.updateWB === 'function') {
@@ -445,8 +450,6 @@ async function bindCharacterClear() {
         } catch(e) { console.log('[花园] 清空条目失败:', e); }
     }
     await addCharacterEntry(currentCardData, wbName);
-    executeSTCommand('/world state=on ' + wbName);
-    console.log('[花园] 已挂载到全局世界书:', wbName);
 }
 
 async function mountCharacterGlobal() {
