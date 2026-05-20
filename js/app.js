@@ -389,8 +389,8 @@ async function bindCharacterClear() {
         } catch(e) { console.log('[花园] 清空条目失败:', e); }
     }
     await addCharacterEntry(currentCardData, wbName);
-    executeSTCommand('/world state=on ' + wbName);
-    console.log('[花园] 已激活世界书:', wbName);
+    executeSTCommand('/getchatbook ' + wbName);
+    console.log('[花园] 已绑定到当前聊天世界书:', wbName);
 }
 
 async function addCharacterToExtra() {
