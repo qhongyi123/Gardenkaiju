@@ -233,30 +233,58 @@ function bindWorldbookIfNeeded() {
     if (!currentCardData || !currentCardData.character) return;
     if (!bindWorldbook) return;
     var ch = characterMap[currentCardData.character];
-    if (!ch || !ch.worldbook) return;
+    if (!ch) return;
     addCharacterEntry(ch);
 }
 
-function addCharacterEntry(ch) {
-    var updateWB = window.parent && window.parent.updateWorldbookWith;
-    if (typeof updateWB !== 'function') {
-        console.log('[花园] 非ST环境，已选择角色:', ch._filename);
+function resolveWorldbookAPI() {
+    var wb = typeof updateWorldbookWith === 'function' ? updateWorldbookWith : null;
+    if (!wb && window.parent) wb = window.parent.updateWorldbookWith;
+    var getWB = typeof getOrCreateChatWorldbook === 'function' ? getOrCreateChatWorldbook :
+        (typeof getOrCreateChatLorebook === 'function' ? getOrCreateChatLorebook : null);
+    if (!getWB && window.parent) getWB = window.parent.getOrCreateChatWorldbook || window.parent.getOrCreateChatLorebook;
+    return { updateWB: wb, getOrCreateWB: getWB };
+}
+
+async function getCurrentWorldbookName() {
+    var apis = resolveWorldbookAPI();
+    if (typeof apis.getOrCreateWB === 'function') {
+        var name = await apis.getOrCreateWB('current');
+        if (name) return name;
+    }
+    return 'current';
+}
+
+async function addCharacterEntry(ch) {
+    var apis = resolveWorldbookAPI();
+    var entryName = '[花园角色]' + ch._filename;
+
+    if (typeof apis.updateWB === 'function') {
+        var wbName = await getCurrentWorldbookName();
+        await apis.updateWB(wbName, function(entries) {
+            var found = false;
+            for (var i = 0; i < entries.length; i++) {
+                if (entries[i].name === entryName) {
+                    entries[i] = buildCharacterEntry(ch, entryName);
+                    found = true;
+                    break;
+                }
+            }
+            if (!found) entries.push(buildCharacterEntry(ch, entryName));
+            return entries;
+        });
+        console.log('[花园] 已绑定角色到世界书:', ch._filename);
         return;
     }
-    updateWB('current', function(entries) {
-        var entryName = '[花园角色]' + ch._filename;
-        var found = false;
-        for (var i = 0; i < entries.length; i++) {
-            if (entries[i].name === entryName) {
-                entries[i] = buildCharacterEntry(ch, entryName);
-                found = true;
-                break;
-            }
-        }
-        if (!found) entries.push(buildCharacterEntry(ch, entryName));
-        return entries;
-    });
-    console.log('[花园] 已绑定角色到世界书:', ch._filename);
+
+    if (typeof triggerSlash !== 'undefined') {
+        var content = (ch.content || ch._filename || '').replace(/"/g, '\\"').replace(/\n/g, '\\n');
+        triggerSlash('/createentry file="' + (ch.worldbook || '花园角色库') + '" key="' + entryName + '" "' + content + '"');
+        console.log('[花园] 已通过斜杠命令添加角色:', ch._filename);
+        return;
+    }
+
+    console.log('[花园] 非ST环境，已选择角色:', ch._filename);
 }
 
 function buildCharacterEntry(ch, entryName) {
@@ -275,20 +303,6 @@ function buildCharacterEntry(ch, entryName) {
     };
 }
 
-function activateWorldbook(wbName) {
-    var updateWB = window.parent && window.parent.updateWorldbookWith;
-    if (typeof updateWB !== 'function') {
-        console.log('[花园] 非ST环境，已选择世界书:', wbName);
-        return;
-    }
-    updateWB('current', function(entries) {
-        return entries.filter(function(e) {
-            return e.name && e.name.indexOf('[花园角色]') !== -1;
-        });
-    });
-    console.log('[花园] 已清空角色条目');
-}
-
 function loadStart() {
     sendStartContent();
     bindWorldbookIfNeeded();
@@ -304,26 +318,25 @@ function updateBindWorldbook() {
     bindWorldbook = document.getElementById('modal-bind-worldbook').checked;
 }
 
-function bindCharacterClear() {
+async function bindCharacterClear() {
     if (!currentCardData) return;
     closeModal('character-modal');
-    var updateWB = window.parent && window.parent.updateWorldbookWith;
-    if (typeof updateWB !== 'function') {
-        console.log('[花园] 非ST环境，已选择角色:', currentCardData._filename);
-        return;
-    }
-    updateWB('current', function(entries) {
-        return entries.filter(function(e) {
-            return !(e.name && e.name.indexOf('[花园角色]') === 0);
+    var apis = resolveWorldbookAPI();
+    if (typeof apis.updateWB === 'function') {
+        var wbName = await getCurrentWorldbookName();
+        await apis.updateWB(wbName, function(entries) {
+            return entries.filter(function(e) {
+                return !(e.name && e.name.indexOf('[花园角色]') === 0);
+            });
         });
-    });
+    }
     addCharacterEntry(currentCardData);
 }
 
-function addCharacterToExtra() {
+async function addCharacterToExtra() {
     if (!currentCardData) return;
     closeModal('character-modal');
-    addCharacterEntry(currentCardData);
+    await addCharacterEntry(currentCardData);
 }
 
 function escapeHtml(str) {
