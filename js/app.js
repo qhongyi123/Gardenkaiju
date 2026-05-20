@@ -328,7 +328,9 @@ async function addCharacterEntry(ch, targetWbName) {
             return;
         } catch(e) {
             console.log('[花园] updateWB 失败, 尝试创建世界书:', e.message);
-            executeSTCommand('/createbook ' + wbName);
+            if (typeof apis.getOrCreateWB === 'function') {
+                try { await apis.getOrCreateWB(wbName); console.log('[花园] 已创建世界书:', wbName); } catch(e2) {}
+            }
             await new Promise(function(r) { setTimeout(r, 600); });
             try {
                 await apis.updateWB(wbName, function(entries) {
@@ -377,9 +379,6 @@ async function bindCharacterClear() {
     console.log('[花园] 清空并绑定角色, 世界书:', wbName, '角色:', currentCardData._filename);
     closeModal('character-modal');
 
-    executeSTCommand('/createbook ' + wbName);
-    await new Promise(function(r) { setTimeout(r, 600); });
-
     var apis = resolveWorldbookAPI();
     if (typeof apis.updateWB === 'function') {
         try {
@@ -392,6 +391,9 @@ async function bindCharacterClear() {
         } catch(e) { console.log('[花园] 清空条目失败:', e); }
     }
     await addCharacterEntry(currentCardData, wbName);
+    if (typeof apis.getOrCreateWB === 'function') {
+        try { await apis.getOrCreateWB(wbName); console.log('[花园] 已激活世界书:', wbName); } catch(e) {}
+    }
 }
 
 async function addCharacterToExtra() {
