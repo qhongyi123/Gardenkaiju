@@ -144,6 +144,7 @@ body {
     overflow-y: auto;
     display: none;
     background: var(--bg-card);
+    min-height: 0;
 }
 
 .tab-content.active {
@@ -886,6 +887,10 @@ body {
 /* ==================== 移动端适配 ==================== */
 
 @media (max-width: 768px) {
+    body {
+        padding: 0;
+    }
+
     .container {
         width: 100%;
         max-width: 100vw;
@@ -970,7 +975,6 @@ body {
 
     .modal-overlay {
         align-items: flex-start;
-        padding: 5vh 0;
     }
 
     #start-modal .modal-content {
@@ -991,7 +995,7 @@ body {
     }
 
     .modal-content {
-        margin: 0 auto;
+        margin: 5vh auto 0;
     }
     .modal-header {
         padding: 10px 12px;
@@ -1084,8 +1088,8 @@ body {
         width: 100%;
     }
 
-    .modal-overlay {
-        padding: 3vh 0;
+    .modal-content {
+        margin-top: 3vh;
     }
 
     .modal-header h3 {
