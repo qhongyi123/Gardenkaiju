@@ -34,7 +34,11 @@ function switchTab(tabId) {
             updateFavToggleCount('chars');
             if (favModeChars) refreshCurrentCards();
         }
-        if (filterOpen) applyFilter();
+        if (filterOpen) {
+            document.getElementById('filter-search').value = filterSearches[tabId] || '';
+            buildTagCloud();
+            applyFilter();
+        }
     }
 }
 
@@ -303,8 +307,15 @@ var FONT_MAP = {
     mashan: "'Ma Shan Zheng', cursive"
 };
 
-var currentFilterTag = null;
+var filterTags = {};
+var filterSearches = {};
 var filterOpen = false;
+
+function getFilterKey() {
+    var activeTab = document.querySelector('.tab-content.active');
+    if (activeTab && (activeTab.id === 'tab3' || activeTab.id === 'tab4' || activeTab.id === 'tab6')) return activeTab.id;
+    return 'tab3';
+}
 
 function toggleFilter() {
     filterOpen = !filterOpen;
@@ -313,6 +324,8 @@ function toggleFilter() {
     if (filterOpen) {
         panel.classList.add('show');
         trigger.classList.add('active');
+        var key = getFilterKey();
+        document.getElementById('filter-search').value = filterSearches[key] || '';
         buildTagCloud();
         applyFilter();
     } else {
@@ -322,17 +335,19 @@ function toggleFilter() {
 
 function closeFilter() {
     filterOpen = false;
+    var key = getFilterKey();
+    filterTags[key] = null;
+    filterSearches[key] = '';
     document.getElementById('filter-panel').classList.remove('show');
     document.getElementById('filter-trigger').classList.remove('active');
-    currentFilterTag = null;
     document.getElementById('filter-search').value = '';
     refreshCurrentCards();
 }
 
 function buildTagCloud() {
-    var allCards = startCardsData.concat(submissionCardsData);
+    var dataArray = getActiveTabCards();
     var tagMap = {};
-    allCards.forEach(function(card) {
+    dataArray.forEach(function(card) {
         if (card.tags && card.tags.length > 0) {
             card.tags.forEach(function(tag) {
                 tagMap[tag] = (tagMap[tag] || 0) + 1;
@@ -341,20 +356,23 @@ function buildTagCloud() {
     });
     var sorted = Object.keys(tagMap).sort(function(a, b) { return tagMap[b] - tagMap[a]; });
 
+    var key = getFilterKey();
+    var currentTag = filterTags[key] || null;
     var container = document.getElementById('filter-tags');
     var html = '';
     sorted.forEach(function(tag) {
-        var active = (currentFilterTag === tag) ? ' active' : '';
+        var active = (currentTag === tag) ? ' active' : '';
         html += '<span class="filter-tag-badge' + active + '" onclick="selectTag(\'' + escapeHtml(tag) + '\')">#' + escapeHtml(tag) + '<span class="tag-count">' + tagMap[tag] + '</span></span>';
     });
     container.innerHTML = html;
 }
 
 function selectTag(tag) {
-    if (currentFilterTag === tag) {
-        currentFilterTag = null;
+    var key = getFilterKey();
+    if (filterTags[key] === tag) {
+        filterTags[key] = null;
     } else {
-        currentFilterTag = tag;
+        filterTags[key] = tag;
     }
     buildTagCloud();
     applyFilter();
@@ -378,7 +396,9 @@ function getActiveContainerId() {
 
 function applyFilter() {
     if (!filterOpen) return;
-    var searchText = document.getElementById('filter-search').value.toLowerCase();
+    var key = getFilterKey();
+    var searchText = (document.getElementById('filter-search').value || '').toLowerCase();
+    filterSearches[key] = searchText;
     var dataArray = getActiveTabCards();
     var containerId = getActiveContainerId();
     if (!containerId || !dataArray.length) return;
@@ -395,8 +415,9 @@ function applyFilter() {
         dataArray = dataArray.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
     }
 
+    var currentTag = filterTags[key] || null;
     var filtered = dataArray.filter(function(card) {
-        var matchTag = !currentFilterTag || (card.tags && card.tags.indexOf(currentFilterTag) >= 0);
+        var matchTag = !currentTag || (card.tags && card.tags.indexOf(currentTag) >= 0);
         var matchSearch = !searchText ||
             (card._filename && card._filename.toLowerCase().indexOf(searchText) >= 0) ||
             (card.content && card.content.toLowerCase().indexOf(searchText) >= 0);
