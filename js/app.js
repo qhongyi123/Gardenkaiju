@@ -266,6 +266,7 @@ async function bindWorldbookIfNeeded() {
         executeSTCommand('/world state=on ' + wbName);
     }
     console.log('[花园] 已挂载角色到全局:', ch._filename);
+    showToast('花园', '角色 ' + ch._filename + ' 已创建并挂载到全局');
 }
 
 function resolveWorldbookAPI() {
@@ -317,6 +318,16 @@ function executeSTCommand(cmd) {
     return false;
 }
 
+function showToast(title, text) {
+    var ctx = getSTContext();
+    if (ctx && typeof ctx.executeSlashCommandsWithOptions === 'function') {
+        try { ctx.executeSlashCommandsWithOptions('/echo title="' + title + '" severity=success ' + text, { handleParserErrors: false }); return; } catch(e) {}
+    }
+    if (typeof triggerSlash !== 'undefined') {
+        try { triggerSlash('/echo title="' + title + '" severity=success ' + text); } catch(e) {}
+    }
+}
+
 async function addCharacterEntry(ch, wbName) {
     var apis = resolveWorldbookAPI();
     var entryName = '[花园角色]' + ch._filename;
@@ -354,11 +365,12 @@ async function addCharacterEntry(ch, wbName) {
             console.log('[花园] updateWB 完成:', ch._filename, '→', wbName);
             return;
         } catch(e) {
-            console.log('[花园] updateWB 失败, 尝试创建:', e.message);
-            if (typeof apis.getOrCreateWB === 'function') {
-                try { await apis.getOrCreateWB(wbName); } catch(e2) {}
+            console.log('[花园] updateWB 失败, 尝试创建世界书:', e.message);
+            var ctx = getSTContext();
+            if (ctx && typeof ctx.executeSlashCommandsWithOptions === 'function') {
+                try { await ctx.executeSlashCommandsWithOptions('/createbook ' + wbName, { handleParserErrors: false }); } catch(e2) {}
             }
-            await new Promise(function(r) { setTimeout(r, 800); });
+            await new Promise(function(r) { setTimeout(r, 1000); });
             try {
                 await apis.updateWB(wbName, function(entries) {
                     entries.push({
@@ -374,6 +386,14 @@ async function addCharacterEntry(ch, wbName) {
         }
     }
     var escapedContent = content.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+    var ctx = getSTContext();
+    if (ctx && typeof ctx.executeSlashCommandsWithOptions === 'function') {
+        try {
+            await ctx.executeSlashCommandsWithOptions('/createentry file="' + wbName + '" key="' + entryName + '" "' + escapedContent + '"', { handleParserErrors: false });
+            console.log('[花园] 斜杠命令已发送');
+            return;
+        } catch(e) {}
+    }
     if (executeSTCommand('/createentry file="' + wbName + '" key="' + entryName + '" "' + escapedContent + '"')) {
         console.log('[花园] 斜杠命令已发送');
         return;
@@ -431,6 +451,7 @@ async function createCharacterWorldbook() {
         } catch(e) { console.log('[花园] 清空条目失败:', e); }
     }
     await addCharacterEntry(currentCardData, wbName);
+    showToast('花园', '世界书 ' + wbName + ' 创建完成');
 }
 
 async function mountCharacterGlobal() {
@@ -447,6 +468,7 @@ async function mountCharacterGlobal() {
         executeSTCommand('/world state=on ' + wbName);
     }
     console.log('[花园] 已挂载到全局:', wbName);
+    showToast('花园', '世界书 ' + wbName + ' 已挂载到全局');
 }
 
 async function addCharacterToExtra() {
