@@ -19,6 +19,7 @@
         <button class="tab-btn" onclick="switchTab('tab2')">花园历史</button>
         <button class="tab-btn" onclick="switchTab('tab3')">开局</button>
         <button class="tab-btn" onclick="switchTab('tab4')">投稿开局</button>
+        <button class="tab-btn" onclick="switchTab('tab6')">人物</button>
         <button class="tab-btn" onclick="switchTab('tab5')">设置</button>
     </div>
 
@@ -50,6 +51,11 @@
     <div id="tab4" class="tab-content">
         <div class="card-grid" id="submission-cards-grid"></div>
         <button class="fav-toggle" id="fav-toggle-subs" onclick="toggleFavoritesView('subs')">📁 收藏夹</button>
+    </div>
+
+    <div id="tab6" class="tab-content">
+        <div class="card-grid" id="character-cards-grid"></div>
+        <button class="fav-toggle" id="fav-toggle-chars" onclick="toggleFavoritesView('chars')">📁 收藏夹</button>
     </div>
 
     <div id="tab5" class="tab-content">
@@ -110,6 +116,18 @@
             <div class="modal-section-title">📄 内容粗览</div>
             <div class="modal-preview" id="modal-preview"></div>
 
+            <div class="modal-character-link" id="modal-character-link" style="display:none">
+                <span class="settings-label">👤 关联人物：</span>
+                <span id="modal-character-name"></span>
+            </div>
+            <div class="settings-row" id="modal-worldbook-row" style="display:none">
+                <span class="settings-label">绑定角色世界书：</span>
+                <label class="wb-toggle">
+                    <input type="checkbox" id="modal-bind-worldbook" checked onchange="updateBindWorldbook()">
+                    <span>加载开局时同步绑定</span>
+                </label>
+            </div>
+
             <div class="modal-actions">
                 <button class="btn btn-secondary" onclick="openViewStartModal()">🔍 查看开局</button>
                 <button class="btn btn-success" onclick="loadStart()">🚀 加载开局</button>
@@ -131,6 +149,28 @@
             <div class="view-actions-bar">
                 <button class="btn btn-secondary" onclick="closeModal('view-start-modal')">↩️ 返回</button>
                 <button class="btn btn-success" onclick="loadStartFromView()">🚀 加载开局</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== 人物详情弹窗 ==================== -->
+<div class="modal-overlay" id="character-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="character-modal-title">人物名称</h3>
+            <button class="modal-fav" id="character-modal-fav-btn" onclick="toggleFavoriteCharacter()">🌼</button>
+            <button class="modal-close" onclick="closeModal('character-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-meta">
+                <span class="meta-author" id="character-modal-author"></span>
+            </div>
+            <div class="modal-tags" id="character-modal-tags"></div>
+            <div class="modal-section-title">📋 角色简介</div>
+            <div class="modal-preview" id="character-modal-preview"></div>
+            <div class="modal-actions">
+                <button class="btn btn-primary" onclick="closeModal('character-modal')">关闭</button>
             </div>
         </div>
     </div>

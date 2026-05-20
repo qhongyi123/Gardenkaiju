@@ -17,3 +17,10 @@ var SUBMISSION_CARDS_FILES = [
   'data/submissions/sub0035-枯萎教会大侵攻！跟我一起守营！.json',
   'data/submissions/sub0036-枯萎教会大侵攻！是雏菊就防守一百天！.json'
 ];
+
+var CHARACTER_CARDS_FILES = [
+  'data/characters/神崎澪.json',
+  'data/characters/星野彩花.json',
+  'data/characters/白雪.json',
+  'data/characters/琉璃.json'
+];

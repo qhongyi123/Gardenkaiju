@@ -485,6 +485,43 @@ body {
     margin-top: 15px;
 }
 
+.modal-character-link {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    margin-top: 12px;
+    padding: 8px 12px;
+    background: #f0f8ff;
+    border-radius: 8px;
+    border: 1px solid #d0e0f0;
+}
+
+.modal-character-link .settings-label {
+    color: var(--color-primary-dark);
+}
+
+#modal-character-name {
+    font-weight: 600;
+    color: var(--color-primary-dark);
+    font-family: var(--font-main);
+}
+
+.wb-toggle {
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    cursor: pointer;
+    font-family: var(--font-content);
+    font-size: 0.9em;
+    color: var(--color-text-light);
+}
+
+.wb-toggle input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-primary);
+}
+
 #start-modal .modal-content {
     width: 90%;
     max-width: 600px;
