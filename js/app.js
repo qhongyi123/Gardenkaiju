@@ -327,8 +327,8 @@ async function addCharacterEntry(ch, targetWbName) {
             console.log('[花园] updateWB 完成:', ch._filename, '→', wbName);
             return;
         } catch(e) {
-            console.log('[花园] updateWB 失败, 尝试创建并激活世界书:', e.message);
-            executeSTCommand('/getchatbook ' + wbName);
+            console.log('[花园] updateWB 失败, 尝试创建并激活全局世界书:', e.message);
+            executeSTCommand('/world state=on ' + wbName);
             await new Promise(function(r) { setTimeout(r, 600); });
             try {
                 await apis.updateWB(wbName, function(entries) {
@@ -372,9 +372,9 @@ function updateBindWorldbook() {
 }
 
 async function bindCharacterClear() {
-    if (!currentCardData) { console.log('[花园] bindCharacterClear: currentCardData 为空'); return; }
+    if (!currentCardData) { console.log('[花园] mountCharacterGlobal: currentCardData 为空'); return; }
     var wbName = document.getElementById('character-wb-name').value.trim() || '花园巡防官投稿角色';
-    console.log('[花园] 清空并绑定角色, 世界书:', wbName, '角色:', currentCardData._filename);
+    console.log('[花园] 挂载到全局, 世界书:', wbName, '角色:', currentCardData._filename);
     closeModal('character-modal');
 
     var apis = resolveWorldbookAPI();
@@ -389,13 +389,16 @@ async function bindCharacterClear() {
         } catch(e) { console.log('[花园] 清空条目失败:', e); }
     }
     await addCharacterEntry(currentCardData, wbName);
-    executeSTCommand('/getchatbook ' + wbName);
-    console.log('[花园] 已绑定到当前聊天世界书:', wbName);
+    executeSTCommand('/world state=on ' + wbName);
+    console.log('[花园] 已挂载到全局世界书:', wbName);
+}
+
+async function mountCharacterGlobal() {
+    await bindCharacterClear();
 }
 
 async function addCharacterToExtra() {
-    if (!currentCardData) { console.log('[花园] addCharacterToExtra: currentCardData 为空'); return; }
-    console.log('[花园] 追加角色到世界书:', currentCardData._filename);
+    if (!currentCardData) return;
     closeModal('character-modal');
     await addCharacterEntry(currentCardData);
 }
