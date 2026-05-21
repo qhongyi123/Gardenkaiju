@@ -387,7 +387,7 @@ async function addCharacterEntry(ch, wbName) {
                 enabled: true,
                 type: 'constant',
                 order: posOrder,
-                position: posType === 'at_depth' ? 'at_depth' : (posType === 'after_char' ? 'after_char' : 'before_char'),
+                position: posType,
                 depth: posType === 'at_depth' ? posDepth : undefined,
                 role: posType === 'at_depth' ? posRole : undefined
             });
