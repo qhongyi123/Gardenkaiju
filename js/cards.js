@@ -15,12 +15,13 @@ var SUBMISSION_CARDS_FILES = [
   'data/submissions/sub002-教会见闻.json',
   'data/submissions/sub003-影子一夜.json',
   'data/submissions/sub0035-枯萎教会大侵攻！跟我一起守营！.json',
-  'data/submissions/sub0036-枯萎教会大侵攻！是雏菊就防守一百天！.json'
+  'data/submissions/sub0036-枯萎教会大侵攻！是雏菊就防守一百天！.json',
+  'data/submissions/sub0042-黄毛の薬物侵害：琉璃无惨.json'
 ];
 
 var CHARACTER_CARDS_FILES = [
   'data/characters/神崎澪.json',
-  'data/characters/星野彩花.json',
+  'data/characters/长风.json',
   'data/characters/白雪.json',
   'data/characters/琉璃.json'
 ];
