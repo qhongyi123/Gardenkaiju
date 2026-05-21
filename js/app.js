@@ -408,6 +408,11 @@ async function mountModGlobal() {
     var wbName = showWbName ? document.getElementById('mod-wb-name').value.trim() : '';
     if (!wbName) { wbName = currentCardData.worldbook || (currentCardData._filename + '的世界书'); }
     closeModal('mod-modal');
+    var exists = await checkSingleWorldbook(wbName);
+    if (!exists) {
+        showToast('花园', '未找到世界书 "' + wbName + '"，请先创建世界书');
+        return;
+    }
     globallyActivate(wbName);
     showToast('花园', '世界书 "' + wbName + '" 已挂载到全局');
 }
@@ -907,6 +912,11 @@ async function mountCharacterGlobal() {
     if (!wbName) { wbName = currentCardData.worldbook || (currentCardData._filename + '的世界书'); }
     console.log('[花园] 挂载到全局:', wbName);
     closeModal('character-modal');
+    var exists = await checkSingleWorldbook(wbName);
+    if (!exists) {
+        showToast('花园', '未找到世界书 "' + wbName + '"，请先创建世界书');
+        return;
+    }
     globallyActivate(wbName);
     showToast('花园', '世界书 "' + wbName + '" 已挂载到全局');
 }
