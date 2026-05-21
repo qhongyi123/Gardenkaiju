@@ -377,25 +377,6 @@ async function addCharacterEntry(ch, wbName) {
     }
     console.log('[花园] 添加角色条目:', entryName, '→', wbName);
 
-    var helper = resolveHelperAPI();
-    if (typeof helper.createEntry === 'function') {
-        try {
-            await helper.createEntry(wbName, {
-                comment: entryName,
-                content: content,
-                key: [entryName, ch._filename],
-                enabled: true,
-                type: 'constant',
-                order: posOrder,
-                position: posType,
-                depth: posType === 'at_depth' ? posDepth : undefined,
-                role: posType === 'at_depth' ? posRole : undefined
-            });
-            console.log('[花园] createLorebookEntry 完成:', ch._filename);
-            return;
-        } catch(e) { console.log('[花园] createLorebookEntry 失败:', e); }
-    }
-
     var apis = resolveWorldbookAPI();
     if (typeof apis.updateWB === 'function') {
         var positionObj = { type: posType, order: posOrder };
@@ -417,6 +398,25 @@ async function addCharacterEntry(ch, wbName) {
             console.log('[花园] updateWB 完成:', ch._filename);
             return;
         } catch(e) { console.log('[花园] updateWB 失败:', e); }
+    }
+
+    var helper = resolveHelperAPI();
+    if (typeof helper.createEntry === 'function') {
+        try {
+            await helper.createEntry(wbName, {
+                comment: entryName,
+                content: content,
+                key: [entryName, ch._filename],
+                enabled: true,
+                type: 'constant',
+                order: posOrder,
+                position: posType,
+                depth: posType === 'at_depth' ? posDepth : undefined,
+                role: posType === 'at_depth' ? posRole : undefined
+            });
+            console.log('[花园] createLorebookEntry 完成:', ch._filename);
+            return;
+        } catch(e) { console.log('[花园] createLorebookEntry 失败:', e); }
     }
 
     var escapedContent = content.replace(/"/g, '\\"').replace(/\n/g, '\\n');
