@@ -117,6 +117,13 @@
             <div class="modal-section-title">📄 内容粗览</div>
             <div class="modal-preview" id="modal-preview"></div>
 
+            <div class="modal-section-title" id="modal-associated-title" style="display:none">🔗 关联内容</div>
+            <div class="associated-table" id="modal-associated-table" style="display:none"></div>
+            <div class="associated-batch-row" id="modal-associated-batch" style="display:none">
+                <button class="btn btn-primary btn-sm" onclick="batchCreateAssociatedWorldbooks()">📝 一键创建所选</button>
+                <span class="batch-hint">（为所有勾选但缺失世界书的内容创建）</span>
+            </div>
+
             <div class="modal-character-link" id="modal-character-link" style="display:none">
                 <span class="settings-label">👤 关联人物：</span>
                 <span id="modal-character-name"></span>

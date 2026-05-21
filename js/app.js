@@ -5,6 +5,7 @@ var characterMap = {};
 var currentCardData = null;
 var bindWorldbook = true;
 var detailEditMode = false;
+var associatedItems = [];
 
 function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(function(tab) { tab.classList.remove('active'); });
@@ -156,6 +157,8 @@ function openModal(cardData) {
 
     var previewEl = document.getElementById('modal-preview');
     previewEl.textContent = cardData.content || '暂无内容';
+
+    renderAssociatedContent(cardData);
 
     var charLink = document.getElementById('modal-character-link');
     var charName = document.getElementById('modal-character-name');
@@ -423,11 +426,13 @@ async function addCharacterEntry(ch, wbName) {
 async function loadStart() {
     sendStartContent();
     await bindWorldbookIfNeeded();
+    await mountAssociatedWorldbooks();
 }
 
 async function loadStartFromView() {
     sendStartContent();
     await bindWorldbookIfNeeded();
+    await mountAssociatedWorldbooks();
     closeModal('view-start-modal');
 }
 
@@ -494,6 +499,182 @@ function escapeHtml(str) {
     var div = document.createElement('div');
     div.textContent = str;
     return div.innerHTML;
+}
+
+function collectAssociatedItems(cardData) {
+    var items = [];
+    if (cardData.related_characters && Array.isArray(cardData.related_characters)) {
+        cardData.related_characters.forEach(function(name) {
+            items.push({type: 'character', name: name});
+        });
+    }
+    if (cardData.related_gameplay && Array.isArray(cardData.related_gameplay)) {
+        cardData.related_gameplay.forEach(function(name) {
+            items.push({type: 'gameplay', name: name});
+        });
+    }
+    if (cardData.related_knowledge && Array.isArray(cardData.related_knowledge)) {
+        cardData.related_knowledge.forEach(function(name) {
+            items.push({type: 'knowledge', name: name});
+        });
+    }
+    return items;
+}
+
+function getWorldbookNameForItem(item) {
+    if (item.type === 'character' && characterMap[item.name]) {
+        var ch = characterMap[item.name];
+        return ch.worldbook || (ch._filename + '的世界书');
+    }
+    return item.name + '的世界书';
+}
+
+async function renderAssociatedContent(cardData) {
+    var items = collectAssociatedItems(cardData);
+    var titleEl = document.getElementById('modal-associated-title');
+    var tableEl = document.getElementById('modal-associated-table');
+    var batchEl = document.getElementById('modal-associated-batch');
+
+    if (items.length === 0) {
+        titleEl.style.display = 'none';
+        tableEl.style.display = 'none';
+        batchEl.style.display = 'none';
+        associatedItems = [];
+        return;
+    }
+
+    titleEl.style.display = '';
+    tableEl.style.display = '';
+    batchEl.style.display = '';
+
+    associatedItems = items.map(function(item) {
+        return {
+            type: item.type,
+            name: item.name,
+            worldbookName: getWorldbookNameForItem(item),
+            hasWorldbook: false,
+            checked: true
+        };
+    });
+
+    renderAssociatedTable();
+    await checkAllWorldbooks();
+    renderAssociatedTable();
+}
+
+function renderAssociatedTable() {
+    var tableEl = document.getElementById('modal-associated-table');
+    var hasMissing = false;
+    var html = '';
+    associatedItems.forEach(function(item, index) {
+        var typeClass = '';
+        var typeLabel = '';
+        if (item.type === 'character') {
+            typeClass = 'row-type-char';
+            typeLabel = '人物';
+        } else if (item.type === 'gameplay') {
+            typeClass = 'row-type-gameplay';
+            typeLabel = '玩法';
+        } else {
+            typeClass = 'row-type-knowledge';
+            typeLabel = '知识';
+        }
+
+        var indicatorClass = item.hasWorldbook ? 'green' : 'red';
+        if (!item.hasWorldbook) hasMissing = true;
+        var checked = item.checked ? ' checked' : '';
+        var createBtn = !item.hasWorldbook
+            ? '<button class="row-create-btn" onclick="createAssociatedWorldbook(' + index + ')">📝 创建</button>'
+            : '';
+
+        html += '<div class="associated-row">';
+        html += '<input type="checkbox" class="row-checkbox" ' + checked + ' onchange="toggleAssociatedCheck(' + index + ', this.checked)">';
+        html += '<span class="row-type ' + typeClass + '">' + typeLabel + '</span>';
+        html += '<span class="row-name">' + escapeHtml(item.name) + '</span>';
+        html += '<span class="row-indicator ' + indicatorClass + '" title="' + (item.hasWorldbook ? '世界书已存在' : '世界书不存在，请创建') + '"></span>';
+        html += createBtn;
+        html += '</div>';
+    });
+    tableEl.innerHTML = html;
+
+    var batchEl = document.getElementById('modal-associated-batch');
+    batchEl.style.display = hasMissing ? '' : 'none';
+}
+
+async function checkAllWorldbooks() {
+    var helper = resolveHelperAPI();
+    var worldbookList = [];
+    if (typeof helper.getLorebooks === 'function') {
+        try {
+            var result = await helper.getLorebooks();
+            if (result) worldbookList = result;
+        } catch(e) {}
+    }
+
+    associatedItems.forEach(function(item) {
+        item.hasWorldbook = worldbookList.indexOf(item.worldbookName) >= 0;
+    });
+}
+
+function toggleAssociatedCheck(index, checked) {
+    associatedItems[index].checked = checked;
+}
+
+async function createAssociatedWorldbook(index) {
+    var item = associatedItems[index];
+    var ok = await ensureWorldbookCreated(item.worldbookName);
+    if (!ok) {
+        var helper = resolveHelperAPI();
+        if (typeof helper.createLorebook !== 'function') {
+            showToast('花园', '前端助手插件未安装，无法创建世界书。请在ST中安装"前端助手"插件。');
+        } else {
+            showToast('花园', '创建失败: ' + item.worldbookName);
+        }
+        return;
+    }
+
+    if (item.type === 'character' && characterMap[item.name]) {
+        var ch = characterMap[item.name];
+        await addCharacterEntry(ch, item.worldbookName);
+    }
+
+    item.hasWorldbook = true;
+    renderAssociatedTable();
+    showToast('花园', '世界书 "' + item.worldbookName + '" 已创建');
+}
+
+async function batchCreateAssociatedWorldbooks() {
+    var toCreate = [];
+    associatedItems.forEach(function(item, i) {
+        if (item.checked && !item.hasWorldbook) {
+            toCreate.push(i);
+        }
+    });
+    if (toCreate.length === 0) {
+        showToast('花园', '无需创建，所选内容均已拥有世界书');
+        return;
+    }
+
+    showToast('花园', '正在依次创建 ' + toCreate.length + ' 个世界书...');
+    for (var j = 0; j < toCreate.length; j++) {
+        await createAssociatedWorldbook(toCreate[j]);
+    }
+    renderAssociatedTable();
+    showToast('花园', '批量创建完成！共创建 ' + toCreate.length + ' 个世界书');
+}
+
+async function mountAssociatedWorldbooks() {
+    var mounted = 0;
+    for (var i = 0; i < associatedItems.length; i++) {
+        var item = associatedItems[i];
+        if (item.checked && item.hasWorldbook) {
+            globallyActivate(item.worldbookName);
+            mounted++;
+        }
+    }
+    if (mounted > 0) {
+        showToast('花园', '已挂载 ' + mounted + ' 个关联世界书到全局');
+    }
 }
 
 function setColumns(n) {

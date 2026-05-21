@@ -1047,6 +1047,130 @@ body {
     }
 }
 
+.associated-table {
+    background: #fafdfa;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    overflow: hidden;
+    margin-bottom: 12px;
+    font-family: var(--font-content);
+}
+
+.associated-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid #f0f0f0;
+}
+.associated-row:last-child {
+    border-bottom: none;
+}
+
+.associated-row .row-checkbox {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--color-primary);
+    cursor: pointer;
+    flex-shrink: 0;
+}
+
+.associated-row .row-type {
+    font-size: 0.7em;
+    padding: 2px 8px;
+    border-radius: 10px;
+    flex-shrink: 0;
+    font-weight: 600;
+}
+
+.row-type-char {
+    background: #e3f2fd;
+    color: #1976d2;
+}
+.row-type-gameplay {
+    background: #f3e5f5;
+    color: #7b1fa2;
+}
+.row-type-knowledge {
+    background: #fff3e0;
+    color: #e65100;
+}
+
+.associated-row .row-name {
+    flex: 1;
+    font-size: 0.85em;
+    color: #333;
+    word-break: break-all;
+}
+
+.associated-row .row-indicator {
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    flex-shrink: 0;
+    transition: background 0.3s;
+}
+.row-indicator.green {
+    background: #66bb6a;
+    box-shadow: 0 0 4px rgba(102, 187, 106, 0.5);
+}
+.row-indicator.red {
+    background: #ef5350;
+    box-shadow: 0 0 4px rgba(239, 83, 80, 0.5);
+}
+
+.associated-row .row-create-btn {
+    padding: 3px 10px;
+    border-radius: 8px;
+    border: 1px solid var(--color-border);
+    background: white;
+    cursor: pointer;
+    font-family: var(--font-main);
+    font-size: 0.75em;
+    color: var(--color-text-light);
+    transition: all 0.2s;
+    flex-shrink: 0;
+    white-space: nowrap;
+}
+.row-create-btn:hover {
+    background: var(--color-primary);
+    color: white;
+    border-color: var(--color-primary);
+}
+
+.associated-batch-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    margin-bottom: 12px;
+    flex-wrap: wrap;
+}
+
+.batch-hint {
+    font-size: 0.75em;
+    color: var(--color-text-light);
+    font-family: var(--font-content);
+}
+
+.btn-sm {
+    padding: 6px 14px;
+    font-size: 0.8em;
+}
+
+@media (max-width: 768px) {
+    .associated-row {
+        gap: 6px;
+        padding: 6px 8px;
+    }
+    .associated-row .row-name {
+        font-size: 0.78em;
+    }
+    .associated-row .row-type {
+        font-size: 0.62em;
+        padding: 1px 6px;
+    }
+}
+
 @media (max-width: 420px) {
     body {
         padding: 0;
