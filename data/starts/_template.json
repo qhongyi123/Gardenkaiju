@@ -8,6 +8,5 @@
   "content": "纯文本正文，用于弹窗展示。换行用 \\n",
   "content_raw": "带格式标签的原始文本（可选，用于发送给AI，不填则删除此行）",
   "related_characters": ["关联的人物名称1"],
-  "related_gameplay": ["关联的玩法1"],
-  "related_knowledge": ["关联的知识条目1"]
+  "related_mod": ["关联的mod1"]
 }

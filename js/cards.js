@@ -28,3 +28,9 @@ var CHARACTER_CARDS_FILES = [
   'data/characters/白雪.json',
   'data/characters/琉璃.json'
 ];
+
+var MOD_CARDS_FILES = [
+  'data/mods/mod001-花园主题包.json',
+  'data/mods/mod002-快捷指令集.json',
+  'data/mods/mod003-骰子扩展.json'
+];

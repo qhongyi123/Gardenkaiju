@@ -1,11 +1,14 @@
 var startCardsData = [];
 var submissionCardsData = [];
 var characterCardsData = [];
+var modCardsData = [];
 var characterMap = {};
 var currentCardData = null;
 var bindWorldbook = true;
 var detailEditMode = false;
 var associatedItems = [];
+var showWbName = false;
+var currentWbStatusTable = '';
 
 function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(function(tab) { tab.classList.remove('active'); });
@@ -18,12 +21,12 @@ function switchTab(tabId) {
         }
     });
 
-    var isCardTab = (tabId === 'tab3' || tabId === 'tab4' || tabId === 'tab6');
+    var isCardTab = (tabId === 'tab3' || tabId === 'tab4' || tabId === 'tab6' || tabId === 'tab7');
     var trigger = document.getElementById('filter-trigger');
     trigger.style.display = isCardTab ? '' : 'none';
     var detailTrigger = document.getElementById('detail-edit-trigger');
-    detailTrigger.style.display = (tabId === 'tab6') ? '' : 'none';
-    if (tabId !== 'tab6' && detailEditMode) {
+    detailTrigger.style.display = (tabId === 'tab6' || tabId === 'tab7') ? '' : 'none';
+    if (tabId !== 'tab6' && tabId !== 'tab7' && detailEditMode) {
         detailEditMode = false;
         detailTrigger.classList.remove('active');
     }
@@ -38,6 +41,9 @@ function switchTab(tabId) {
         } else if (tabId === 'tab4') {
             updateFavToggleCount('subs');
             if (favModeSubs) refreshCurrentCards();
+        } else if (tabId === 'tab7') {
+            updateFavToggleCount('mods');
+            if (favModeMods) refreshCurrentCards();
         } else {
             updateFavToggleCount('chars');
             if (favModeChars) refreshCurrentCards();
@@ -115,6 +121,8 @@ function renderStartCards(containerId, dataArray) {
             if (foundCard) {
                 if (containerId === 'character-cards-grid') {
                     openCharacterModal(foundCard);
+                } else if (containerId === 'mod-cards-grid') {
+                    openModModal(foundCard);
                 } else {
                     openModal(foundCard);
                 }
@@ -212,8 +220,14 @@ function openCharacterModal(cardData) {
 
     document.getElementById('character-modal-preview').textContent = cardData.content || '暂无简介';
 
-    var wbInput = document.getElementById('character-wb-name');
-    wbInput.value = cardData.worldbook || '';
+    renderSingleWorldbookStatus(cardData, 'character-associated-table', 'character');
+
+    var wbRow = document.getElementById('character-wb-name-row');
+    wbRow.style.display = showWbName ? '' : 'none';
+    if (showWbName) {
+        var wbInput = document.getElementById('character-wb-name');
+        wbInput.value = cardData.worldbook || '';
+    }
 
     var detailSection = document.getElementById('character-detail-edit');
     if (detailEditMode) {
@@ -230,6 +244,230 @@ function openCharacterModal(cardData) {
 
     document.getElementById('character-modal').classList.add('show');
     updateCharacterFavButton();
+}
+
+async function renderSingleWorldbookStatus(cardData, tableId, type) {
+    var wbName = cardData.worldbook || (cardData._filename + '的世界书');
+    var tableEl = document.getElementById(tableId);
+    if (!tableEl) return;
+
+    currentWbStatusTable = tableId;
+
+    var exists = await checkSingleWorldbook(wbName);
+    var indicatorClass = exists ? 'green' : 'red';
+    var indicatorTitle = exists ? '世界书已存在' : '世界书不存在';
+    var createBtn = !exists
+        ? '<button class="row-create-btn" onclick="createWorldbookFromStatus()">📝 创建</button>'
+        : '';
+
+    var html = '<div class="associated-row">';
+    html += '<span class="row-type row-type-char">世界书</span>';
+    html += '<span class="row-name">' + escapeHtml(wbName) + '</span>';
+    html += '<span class="row-indicator ' + indicatorClass + '" title="' + indicatorTitle + '"></span>';
+    html += createBtn;
+    html += '</div>';
+    tableEl.innerHTML = html;
+}
+
+async function checkSingleWorldbook(wbName) {
+    var helper = resolveHelperAPI();
+    if (typeof helper.getLorebooks === 'function') {
+        try {
+            var result = await helper.getLorebooks();
+            if (result) return result.indexOf(wbName) >= 0;
+        } catch(e) {}
+    }
+    return false;
+}
+
+function createWorldbookFromStatus() {
+    if (!currentCardData) return;
+    var wbName = currentCardData.worldbook || (currentCardData._filename + '的世界书');
+    var tableId = currentWbStatusTable;
+    ensureWorldbookCreated(wbName).then(function(ok) {
+        if (ok) {
+            showToast('花园', '世界书 "' + wbName + '" 已创建');
+            if (tableId && currentCardData) {
+                renderSingleWorldbookStatus(currentCardData, tableId, '');
+            }
+        } else {
+            showToast('花园', '创建失败: ' + wbName);
+        }
+    });
+}
+
+function openModModal(cardData) {
+    currentCardData = cardData;
+
+    document.getElementById('mod-modal-title').textContent = cardData._filename || '未命名';
+
+    var authorEl = document.getElementById('mod-modal-author');
+    if (cardData.author) {
+        authorEl.textContent = '✎ ' + cardData.author;
+        authorEl.style.display = 'inline';
+    } else {
+        authorEl.style.display = 'none';
+    }
+
+    var tagsContainer = document.getElementById('mod-modal-tags');
+    if (cardData.tags && cardData.tags.length > 0) {
+        tagsContainer.innerHTML = cardData.tags.map(function(tag) {
+            return '<span class="modal-tag">#' + escapeHtml(tag) + '</span>';
+        }).join('');
+        tagsContainer.style.display = 'flex';
+    } else {
+        tagsContainer.innerHTML = '';
+        tagsContainer.style.display = 'none';
+    }
+
+    document.getElementById('mod-modal-preview').textContent = cardData.content || '暂无描述';
+
+    renderSingleWorldbookStatus(cardData, 'mod-associated-table', 'mod');
+
+    var wbRow = document.getElementById('mod-wb-name-row');
+    wbRow.style.display = showWbName ? '' : 'none';
+    if (showWbName) {
+        document.getElementById('mod-wb-name').value = cardData.worldbook || '';
+    }
+
+    var detailSection = document.getElementById('mod-detail-edit');
+    if (detailEditMode) {
+        detailSection.style.display = '';
+        var posType = (cardData.position && cardData.position.type) || 'at_depth';
+        document.getElementById('mod-detail-position-type').value = posType;
+        document.getElementById('mod-detail-role').value = (cardData.position && cardData.position.role) || 'system';
+        document.getElementById('mod-detail-depth').value = (cardData.position && cardData.position.depth) || 4;
+        document.getElementById('mod-detail-order').value = (cardData.position && cardData.position.order) || 0;
+        document.getElementById('mod-detail-depth-fields').style.display = (posType === 'at_depth') ? '' : 'none';
+    } else {
+        detailSection.style.display = 'none';
+    }
+
+    document.getElementById('mod-modal').classList.add('show');
+    updateModFavButton();
+}
+
+function toggleFavoriteMod() {
+    if (!currentCardData) return;
+    var favs = getFavorites('mods');
+    var idx = favs.indexOf(currentCardData.id);
+    if (idx >= 0) {
+        favs.splice(idx, 1);
+    } else {
+        favs.push(currentCardData.id);
+    }
+    saveFavorites('mods', favs);
+    updateModFavButton();
+    updateFavToggleCount('mods');
+    refreshCurrentCards();
+}
+
+function updateModFavButton() {
+    if (!currentCardData) return;
+    var btn = document.getElementById('mod-modal-fav-btn');
+    if (isFavorited(currentCardData.id, 'mods')) {
+        btn.classList.add('favorited');
+    } else {
+        btn.classList.remove('favorited');
+    }
+}
+
+async function createModWorldbook() {
+    if (!currentCardData) return;
+    var wbName = showWbName ? document.getElementById('mod-wb-name').value.trim() : '';
+    if (!wbName) { wbName = currentCardData.worldbook || (currentCardData._filename + '的世界书'); }
+    closeModal('mod-modal');
+
+    var ok = await ensureWorldbookCreated(wbName);
+    if (!ok) {
+        var helper = resolveHelperAPI();
+        if (typeof helper.createLorebook !== 'function') {
+            showToast('花园', '前端助手插件未安装，无法创建独立世界书。请在ST中安装"前端助手"插件。');
+        } else {
+            showToast('花园', '创建失败: ' + wbName);
+        }
+        return;
+    }
+    await addModEntry(currentCardData, wbName);
+    showToast('花园', '世界书 "' + wbName + '" 已创建并写入Mod ' + currentCardData._filename);
+}
+
+async function mountModGlobal() {
+    if (!currentCardData) return;
+    var wbName = showWbName ? document.getElementById('mod-wb-name').value.trim() : '';
+    if (!wbName) { wbName = currentCardData.worldbook || (currentCardData._filename + '的世界书'); }
+    closeModal('mod-modal');
+    globallyActivate(wbName);
+    showToast('花园', '世界书 "' + wbName + '" 已挂载到全局');
+}
+
+function toggleModDepthFields() {
+    var type = document.getElementById('mod-detail-position-type').value;
+    var div = document.getElementById('mod-detail-depth-fields');
+    div.style.display = (type === 'at_depth') ? '' : 'none';
+}
+
+async function addModEntry(cardData, wbName) {
+    var entryName = '[花园Mod]' + cardData._filename;
+    var content = cardData.content || cardData._filename;
+    var posType = (cardData.position && cardData.position.type) || 'at_depth';
+    var posRole = (cardData.position && cardData.position.role) || 'system';
+    var posDepth = (cardData.position && cardData.position.depth) || 4;
+    var posOrder = (cardData.position && cardData.position.order) || 0;
+    if (detailEditMode) {
+        posType = document.getElementById('mod-detail-position-type').value || 'at_depth';
+        posRole = document.getElementById('mod-detail-role').value || 'system';
+        posDepth = parseInt(document.getElementById('mod-detail-depth').value) || 4;
+        posOrder = parseInt(document.getElementById('mod-detail-order').value) || 0;
+    }
+
+    var apis = resolveWorldbookAPI();
+    if (typeof apis.updateWB === 'function') {
+        var positionObj = { type: posType, order: posOrder };
+        if (posType === 'at_depth') { positionObj.role = posRole; positionObj.depth = posDepth; }
+        try {
+            await apis.updateWB(wbName, function(entries) {
+                var entry = {
+                    name: entryName, enabled: true, content: content,
+                    strategy: { type: 'constant', keys: [entryName, cardData._filename], keys_secondary: { logic: 'and_any', keys: [] }, scan_depth: 'same_as_global' },
+                    position: positionObj, probability: 100
+                };
+                var found = false;
+                for (var i = 0; i < entries.length; i++) {
+                    if (entries[i].name === entryName) { entries[i] = entry; found = true; break; }
+                }
+                if (!found) entries.push(entry);
+                return entries;
+            });
+            return;
+        } catch(e) { console.log('[花园] updateWB mod失败:', e); }
+    }
+
+    var helper = resolveHelperAPI();
+    if (typeof helper.createEntry === 'function') {
+        try {
+            await helper.createEntry(wbName, {
+                comment: entryName,
+                content: content,
+                key: [entryName, cardData._filename],
+                enabled: true,
+                type: 'constant',
+                order: posOrder,
+                position: posType,
+                depth: posType === 'at_depth' ? posDepth : undefined,
+                role: posType === 'at_depth' ? posRole : undefined
+            });
+            return;
+        } catch(e) { console.log('[花园] createLorebookEntry mod失败:', e); }
+    }
+
+    var escapedContent = content.replace(/"/g, '\\"').replace(/\n/g, '\\n');
+    executeSTCommand('/createentry file="' + wbName + '" key="' + entryName + '" "' + escapedContent + '"');
+}
+
+function toggleShowWbName(checked) {
+    showWbName = checked;
+    localStorage.setItem('garden-show-wb-name', checked ? '1' : '0');
 }
 
 function openViewStartModal() {
@@ -707,6 +945,10 @@ function initSettings() {
     if (savedFont) {
         setFontFamily(savedFont);
     }
+    var savedShowWbName = localStorage.getItem('garden-show-wb-name');
+    showWbName = (savedShowWbName === '1');
+    var cb = document.getElementById('setting-show-wb-name');
+    if (cb) cb.checked = showWbName;
 }
 
 var FONT_MAP = {
@@ -722,7 +964,7 @@ var filterOpen = false;
 
 function getFilterKey() {
     var activeTab = document.querySelector('.tab-content.active');
-    if (activeTab && (activeTab.id === 'tab3' || activeTab.id === 'tab4' || activeTab.id === 'tab6')) return activeTab.id;
+    if (activeTab && (activeTab.id === 'tab3' || activeTab.id === 'tab4' || activeTab.id === 'tab6' || activeTab.id === 'tab7')) return activeTab.id;
     return 'tab3';
 }
 
@@ -792,6 +1034,7 @@ function getActiveTabCards() {
     if (activeTab && activeTab.id === 'tab3') return startCardsData;
     if (activeTab && activeTab.id === 'tab4') return submissionCardsData;
     if (activeTab && activeTab.id === 'tab6') return characterCardsData;
+    if (activeTab && activeTab.id === 'tab7') return modCardsData;
     return [];
 }
 
@@ -800,6 +1043,7 @@ function getActiveContainerId() {
     if (activeTab && activeTab.id === 'tab3') return 'start-cards-grid';
     if (activeTab && activeTab.id === 'tab4') return 'submission-cards-grid';
     if (activeTab && activeTab.id === 'tab6') return 'character-cards-grid';
+    if (activeTab && activeTab.id === 'tab7') return 'mod-cards-grid';
     return null;
 }
 
@@ -822,6 +1066,9 @@ function applyFilter() {
     } else if (activeTab && activeTab.id === 'tab6' && favModeChars) {
         var favIds = getFavorites('chars');
         dataArray = dataArray.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
+    } else if (activeTab && activeTab.id === 'tab7' && favModeMods) {
+        var favIds = getFavorites('mods');
+        dataArray = dataArray.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
     }
 
     var currentTag = filterTags[key] || null;
@@ -840,15 +1087,18 @@ function resetAllCards() {
     renderStartCards('start-cards-grid', startCardsData);
     renderStartCards('submission-cards-grid', submissionCardsData);
     renderStartCards('character-cards-grid', characterCardsData);
+    renderStartCards('mod-cards-grid', modCardsData);
 }
 
 var favModeStarts = false;
 var favModeSubs = false;
 var favModeChars = false;
+var favModeMods = false;
 
 function getFavKey(type) {
     if (type === 'starts') return 'garden-fav-starts';
     if (type === 'subs') return 'garden-fav-subs';
+    if (type === 'mods') return 'garden-fav-mods';
     return 'garden-fav-chars';
 }
 
@@ -872,6 +1122,7 @@ function toggleFavoriteCard() {
     var type = 'starts';
     if (activeTab && activeTab.id === 'tab4') type = 'subs';
     if (activeTab && activeTab.id === 'tab6') type = 'chars';
+    if (activeTab && activeTab.id === 'tab7') type = 'mods';
     var favs = getFavorites(type);
     var idx = favs.indexOf(currentCardData.id);
     if (idx >= 0) {
@@ -906,6 +1157,7 @@ function updateFavButton() {
     var type = 'starts';
     if (activeTab && activeTab.id === 'tab4') type = 'subs';
     if (activeTab && activeTab.id === 'tab6') type = 'chars';
+    if (activeTab && activeTab.id === 'tab7') type = 'mods';
     var btn = document.getElementById('modal-fav-btn');
     if (isFavorited(currentCardData.id, type)) {
         btn.classList.add('favorited');
@@ -943,10 +1195,12 @@ function toggleFavoritesView(type) {
         favModeStarts = !favModeStarts;
     } else if (type === 'subs') {
         favModeSubs = !favModeSubs;
+    } else if (type === 'mods') {
+        favModeMods = !favModeMods;
     } else {
         favModeChars = !favModeChars;
     }
-    var active = (type === 'starts') ? favModeStarts : (type === 'subs') ? favModeSubs : favModeChars;
+    var active = (type === 'starts') ? favModeStarts : (type === 'subs') ? favModeSubs : (type === 'mods') ? favModeMods : favModeChars;
     var btn = document.getElementById('fav-toggle-' + type);
     if (active) {
         btn.classList.add('active');
@@ -983,6 +1237,13 @@ function refreshCurrentCards() {
             data = data.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
         }
         renderStartCards('character-cards-grid', data);
+    } else if (activeTab.id === 'tab7') {
+        var data = modCardsData;
+        if (favModeMods) {
+            var favIds = getFavorites('mods');
+            data = data.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
+        }
+        renderStartCards('mod-cards-grid', data);
     }
 }
 
@@ -1057,18 +1318,21 @@ document.addEventListener('DOMContentLoaded', async function() {
     startCardsData = await loadCards(START_CARDS_FILES);
     submissionCardsData = await loadCards(SUBMISSION_CARDS_FILES);
     characterCardsData = await loadCards(CHARACTER_CARDS_FILES);
+    modCardsData = await loadCards(MOD_CARDS_FILES);
     characterCardsData.forEach(function(ch) {
         characterMap[ch._filename] = ch;
     });
     renderStartCards('start-cards-grid', startCardsData);
     renderStartCards('submission-cards-grid', submissionCardsData);
     renderStartCards('character-cards-grid', characterCardsData);
+    renderStartCards('mod-cards-grid', modCardsData);
     loadPreface();
     loadHistory();
     initSettings();
     updateFavToggleCount('starts');
     updateFavToggleCount('subs');
     updateFavToggleCount('chars');
+    updateFavToggleCount('mods');
 });
 
 document.addEventListener('click', function(e) {

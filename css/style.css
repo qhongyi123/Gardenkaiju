@@ -587,6 +587,12 @@ body {
     max-height: 80vh;
 }
 
+#mod-modal .modal-content {
+    width: 90%;
+    max-width: 500px;
+    max-height: 80vh;
+}
+
 .view-content-scroll {
     flex: 1;
     overflow-y: auto;
@@ -997,6 +1003,11 @@ body {
         border-radius: 12px;
     }
     #character-modal .modal-content {
+        width: 95%;
+        max-height: 90vh;
+        border-radius: 12px;
+    }
+    #mod-modal .modal-content {
         width: 95%;
         max-height: 90vh;
         border-radius: 12px;

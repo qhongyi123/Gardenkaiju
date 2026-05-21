@@ -21,6 +21,7 @@
         <button class="tab-btn" onclick="switchTab('tab3')">开局</button>
         <button class="tab-btn" onclick="switchTab('tab4')">投稿开局</button>
         <button class="tab-btn" onclick="switchTab('tab6')">投稿角色</button>
+        <button class="tab-btn" onclick="switchTab('tab7')">Mod</button>
         <button class="tab-btn" onclick="switchTab('tab5')">设置</button>
     </div>
 
@@ -59,6 +60,11 @@
         <button class="fav-toggle" id="fav-toggle-chars" onclick="toggleFavoritesView('chars')">📁 收藏夹</button>
     </div>
 
+    <div id="tab7" class="tab-content">
+        <div class="card-grid" id="mod-cards-grid"></div>
+        <button class="fav-toggle" id="fav-toggle-mods" onclick="toggleFavoritesView('mods')">📁 收藏夹</button>
+    </div>
+
     <div id="tab5" class="tab-content">
         <div class="settings-section">
             <h3>⚙ 设置</h3>
@@ -94,6 +100,13 @@
                 <button class="font-btn" onclick="setFontFamily('serif')">书简体</button>
                 <button class="font-btn" onclick="setFontFamily('sans')">云水体</button>
                 <button class="font-btn" onclick="setFontFamily('mashan')">墨痕体</button>
+            </div>
+            <div class="settings-row separated">
+                <span class="settings-label">高级选项：</span>
+                <label class="wb-toggle">
+                    <input type="checkbox" id="setting-show-wb-name" onchange="toggleShowWbName(this.checked)">
+                    <span>显示自定义世界书命名</span>
+                </label>
             </div>
         </div>
     </div>
@@ -177,7 +190,8 @@
             <div class="modal-tags" id="character-modal-tags"></div>
             <div class="modal-section-title">📋 角色简介</div>
             <div class="modal-preview" id="character-modal-preview"></div>
-            <div class="settings-row" id="character-wb-name-row">
+            <div class="associated-table" id="character-associated-table" style="margin-bottom: 12px"></div>
+            <div id="character-wb-name-row" class="settings-row" style="display:none">
                 <span class="settings-label">世界书名称（选填）：</span>
                 <input type="text" id="character-wb-name" class="wb-name-input" value="" placeholder="留空则使用默认名称">
             </div>
@@ -214,6 +228,66 @@
                 <button class="btn btn-success" onclick="createCharacterWorldbook()">📝 创建世界书</button>
                 <button class="btn btn-secondary" onclick="mountCharacterGlobal()">🌐 挂载到全局</button>
                 <button class="btn btn-primary" onclick="closeModal('character-modal')">关闭</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- ==================== Mod详情弹窗 ==================== -->
+<div class="modal-overlay" id="mod-modal">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h3 id="mod-modal-title">Mod名称</h3>
+            <button class="modal-fav" id="mod-modal-fav-btn" onclick="toggleFavoriteMod()">🌼</button>
+            <button class="modal-close" onclick="closeModal('mod-modal')">✕</button>
+        </div>
+        <div class="modal-body">
+            <div class="modal-meta">
+                <span class="meta-author" id="mod-modal-author"></span>
+            </div>
+            <div class="modal-tags" id="mod-modal-tags"></div>
+            <div class="modal-section-title">📋 内容描述</div>
+            <div class="modal-preview" id="mod-modal-preview"></div>
+            <div class="associated-table" id="mod-associated-table" style="margin-bottom: 12px"></div>
+            <div id="mod-wb-name-row" style="display:none">
+                <div class="settings-row">
+                    <span class="settings-label">世界书名称（选填）：</span>
+                    <input type="text" id="mod-wb-name" class="wb-name-input" value="" placeholder="留空则使用默认名称">
+                </div>
+            </div>
+            <div id="mod-detail-edit" style="display:none">
+                <div class="modal-section-title">📝 细致编辑</div>
+                <div class="settings-row">
+                    <span class="settings-label">位置：</span>
+                    <select id="mod-detail-position-type" class="wb-select" onchange="toggleModDepthFields()">
+                        <option value="at_depth" selected>系统提示中</option>
+                        <option value="before_char">角色定义前</option>
+                        <option value="after_char">角色定义后</option>
+                    </select>
+                </div>
+                <div id="mod-detail-depth-fields">
+                    <div class="settings-row">
+                        <span class="settings-label">角色：</span>
+                        <select id="mod-detail-role" class="wb-select">
+                            <option value="system">system</option>
+                            <option value="assistant">assistant</option>
+                            <option value="user">user</option>
+                        </select>
+                    </div>
+                    <div class="settings-row">
+                        <span class="settings-label">深度：</span>
+                        <input type="number" id="mod-detail-depth" class="wb-name-input" value="4" min="0" max="99" style="width:60px">
+                    </div>
+                </div>
+                <div class="settings-row">
+                    <span class="settings-label">顺序：</span>
+                    <input type="number" id="mod-detail-order" class="wb-name-input" value="0" min="0" max="9999" style="width:80px">
+                </div>
+            </div>
+            <div class="modal-actions">
+                <button class="btn btn-success" onclick="createModWorldbook()">📝 创建世界书</button>
+                <button class="btn btn-secondary" onclick="mountModGlobal()">🌐 挂载到全局</button>
+                <button class="btn btn-primary" onclick="closeModal('mod-modal')">关闭</button>
             </div>
         </div>
     </div>
