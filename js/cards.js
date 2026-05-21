@@ -14,8 +14,11 @@ var SUBMISSION_CARDS_FILES = [
   'data/submissions/sub001-新芽.json',
   'data/submissions/sub002-教会见闻.json',
   'data/submissions/sub003-影子一夜.json',
+  'data/submissions/sub0013-扮演焰的妻子，玩视觉剥夺.json',
   'data/submissions/sub0035-枯萎教会大侵攻！跟我一起守营！.json',
   'data/submissions/sub0036-枯萎教会大侵攻！是雏菊就防守一百天！.json',
+  'data/submissions/sub0037-开局继承百亿和佣兵公司，登上影子帝王的宝座吧！.json',
+  'data/submissions/sub0038-东京陷落！雏菊沉没之日！？.json',
   'data/submissions/sub0042-黄毛の薬物侵害：琉璃无惨.json'
 ];
 

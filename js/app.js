@@ -218,11 +218,11 @@ function openCharacterModal(cardData) {
     var detailSection = document.getElementById('character-detail-edit');
     if (detailEditMode) {
         detailSection.style.display = '';
-        var posType = (cardData.position && cardData.position.type) || 'before_char';
+        var posType = (cardData.position && cardData.position.type) || 'at_depth';
         document.getElementById('detail-position-type').value = posType;
         document.getElementById('detail-role').value = (cardData.position && cardData.position.role) || 'system';
         document.getElementById('detail-depth').value = (cardData.position && cardData.position.depth) || 4;
-        document.getElementById('detail-order').value = (cardData.position && cardData.position.order) || 100;
+        document.getElementById('detail-order').value = (cardData.position && cardData.position.order) || 0;
         document.getElementById('detail-depth-fields').style.display = (posType === 'at_depth') ? '' : 'none';
     } else {
         detailSection.style.display = 'none';
@@ -365,15 +365,15 @@ function showToast(title, text) {
 async function addCharacterEntry(ch, wbName) {
     var entryName = '[花园角色]' + ch._filename;
     var content = ch.content || ch._filename;
-    var posType = (ch.position && ch.position.type) || 'before_char';
+    var posType = (ch.position && ch.position.type) || 'at_depth';
     var posRole = (ch.position && ch.position.role) || 'system';
     var posDepth = (ch.position && ch.position.depth) || 4;
-    var posOrder = (ch.position && ch.position.order) || 100;
+    var posOrder = (ch.position && ch.position.order) || 0;
     if (detailEditMode) {
-        posType = document.getElementById('detail-position-type').value || 'before_char';
+        posType = document.getElementById('detail-position-type').value || 'at_depth';
         posRole = document.getElementById('detail-role').value || 'system';
         posDepth = parseInt(document.getElementById('detail-depth').value) || 4;
-        posOrder = parseInt(document.getElementById('detail-order').value) || 100;
+        posOrder = parseInt(document.getElementById('detail-order').value) || 0;
     }
     console.log('[花园] 添加角色条目:', entryName, '→', wbName);
 

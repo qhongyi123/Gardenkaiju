@@ -186,9 +186,9 @@
                 <div class="settings-row">
                     <span class="settings-label">位置：</span>
                     <select id="detail-position-type" class="wb-select" onchange="toggleDepthFields()">
+                        <option value="at_depth">系统提示中</option>
                         <option value="before_char">角色定义前</option>
                         <option value="after_char">角色定义后</option>
-                        <option value="at_depth">系统提示中</option>
                     </select>
                 </div>
                 <div id="detail-depth-fields">
@@ -207,7 +207,7 @@
                 </div>
                 <div class="settings-row">
                     <span class="settings-label">顺序：</span>
-                    <input type="number" id="detail-order" class="wb-name-input" value="100" min="0" max="9999" style="width:80px">
+                    <input type="number" id="detail-order" class="wb-name-input" value="0" min="0" max="9999" style="width:80px">
                 </div>
             </div>
             <div class="modal-actions">
