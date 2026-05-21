@@ -1246,3 +1246,107 @@ body {
         font-size: 0.8em;
     }
 }
+
+/* ==================== 世界书管理 ==================== */
+.wb-manage-section {
+    background: #f6fdf6;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--color-border);
+    font-family: var(--font-content);
+}
+
+.wb-manage-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: 14px;
+    flex-wrap: wrap;
+    gap: 10px;
+}
+
+.wb-manage-header h3 {
+    margin: 0;
+    color: var(--color-primary-dark);
+    font-family: var(--font-main);
+    font-size: 1.1em;
+}
+
+.wb-manage-header-actions {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+}
+
+.wb-manage-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.wb-manage-empty {
+    text-align: center;
+    color: var(--color-text-light);
+    padding: 30px 20px;
+    font-size: 0.9em;
+}
+
+.wb-manage-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 10px 14px;
+    background: white;
+    border-radius: 10px;
+    border: 1px solid var(--color-border);
+    gap: 10px;
+    flex-wrap: wrap;
+}
+
+.wb-manage-name {
+    flex: 1;
+    font-size: 0.9em;
+    color: #333;
+    word-break: break-all;
+    font-family: var(--font-content);
+}
+
+.wb-manage-row-actions {
+    display: flex;
+    gap: 6px;
+    flex-shrink: 0;
+}
+
+.btn-xs {
+    padding: 4px 12px;
+    font-size: 0.75em;
+    font-family: var(--font-main);
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background 0.2s, transform 0.1s;
+}
+
+.btn-xs:hover {
+    transform: translateY(-1px);
+}
+
+.btn-danger {
+    background: #ef5350;
+    color: white;
+}
+.btn-danger:hover {
+    background: #d32f2f;
+}
+
+@media (max-width: 768px) {
+    .wb-manage-section {
+        padding: 12px;
+    }
+    .wb-manage-row {
+        padding: 8px 10px;
+    }
+    .wb-manage-name {
+        font-size: 0.8em;
+    }
+}

@@ -9,6 +9,8 @@ var detailEditMode = false;
 var associatedItems = [];
 var showWbName = false;
 var currentWbStatusTable = '';
+var currentCreatedWbList = [];
+var currentMountedWbList = [];
 
 function switchTab(tabId) {
     document.querySelectorAll('.tab-content').forEach(function(tab) { tab.classList.remove('active'); });
@@ -33,6 +35,10 @@ function switchTab(tabId) {
 
     if (!isCardTab && filterOpen) {
         closeFilter();
+    }
+    if (tabId === 'tab8') {
+        refreshCreatedWorldbooks();
+        refreshGlobalWorldbooks();
     }
     if (isCardTab) {
         if (tabId === 'tab3') {
@@ -284,8 +290,13 @@ function createWorldbookFromStatus() {
     if (!currentCardData) return;
     var wbName = currentCardData.worldbook || (currentCardData._filename + '的世界书');
     var tableId = currentWbStatusTable;
-    ensureWorldbookCreated(wbName).then(function(ok) {
+    ensureWorldbookCreated(wbName).then(async function(ok) {
         if (ok) {
+            if (tableId.indexOf('character') >= 0) {
+                await addCharacterEntry(currentCardData, wbName);
+            } else if (tableId.indexOf('mod') >= 0) {
+                await addModEntry(currentCardData, wbName);
+            }
             showToast('花园', '世界书 "' + wbName + '" 已创建');
             if (tableId && currentCardData) {
                 renderSingleWorldbookStatus(currentCardData, tableId, '');
@@ -470,6 +481,174 @@ function toggleShowWbName(checked) {
     localStorage.setItem('garden-show-wb-name', checked ? '1' : '0');
 }
 
+// ==================== 额外内容管理 ====================
+
+async function refreshCreatedWorldbooks() {
+    var listEl = document.getElementById('wb-created-list');
+    if (!listEl) return;
+    listEl.innerHTML = '<div class="wb-manage-empty">⏳ 加载中...</div>';
+
+    var helper = resolveHelperAPI();
+    var allNames = [];
+    if (typeof helper.getLorebooks === 'function') {
+        try {
+            var result = await helper.getLorebooks();
+            if (result && Array.isArray(result)) allNames = result;
+        } catch(e) { console.log('[花园] getLorebooks 失败:', e); }
+    }
+
+    var filtered = allNames.filter(function(name) {
+        return name && name.indexOf('的世界书') >= 0 && name.indexOf('的世界书') === name.length - 4;
+    });
+
+    currentCreatedWbList = filtered;
+
+    if (filtered.length === 0) {
+        listEl.innerHTML = '<div class="wb-manage-empty">📭 暂无匹配"XX的世界书"格式的世界书</div>';
+        return;
+    }
+
+    var html = '';
+    filtered.forEach(function(name, i) {
+        html += '<div class="wb-manage-row">';
+        html += '<span class="wb-manage-name">📖 ' + escapeHtml(name) + '</span>';
+        html += '<div class="wb-manage-row-actions">';
+        html += '<button class="btn btn-success btn-xs" onclick="mountCreatedWbByIndex(' + i + ')">🌐 挂载</button>';
+        html += '<button class="btn btn-danger btn-xs" onclick="deleteCreatedWbByIndex(' + i + ')">🗑 删除</button>';
+        html += '</div>';
+        html += '</div>';
+    });
+    listEl.innerHTML = html;
+}
+
+function mountCreatedWbByIndex(index) {
+    var name = currentCreatedWbList[index];
+    if (!name) return;
+    globallyActivate(name);
+    showToast('花园', '已挂载到全局: ' + name);
+    setTimeout(function() { refreshGlobalWorldbooks(); }, 500);
+}
+
+function deleteCreatedWbByIndex(index) {
+    var name = currentCreatedWbList[index];
+    if (!name) return;
+    if (!confirm('确定要删除世界书 "' + name + '" 吗？此操作不可撤销。')) return;
+
+    var helper = resolveHelperAPI();
+    if (typeof helper.deleteLorebook === 'function') {
+        helper.deleteLorebook(name).then(function() {
+            showToast('花园', '已删除: ' + name);
+            refreshCreatedWorldbooks();
+            refreshGlobalWorldbooks();
+        }).catch(function() {
+            showToast('花园', '删除失败: ' + name);
+        });
+    } else {
+        showToast('花园', '前端助手插件未安装或不支持删除功能');
+        refreshCreatedWorldbooks();
+    }
+}
+
+async function refreshGlobalWorldbooks() {
+    var listEl = document.getElementById('wb-global-list');
+    if (!listEl) return;
+    listEl.innerHTML = '<div class="wb-manage-empty">⏳ 加载中...</div>';
+
+    var mountedNames = await getMountedWorldbooks();
+    currentMountedWbList = mountedNames;
+
+    if (mountedNames.length === 0) {
+        listEl.innerHTML = '<div class="wb-manage-empty">📭 当前没有全局挂载的世界书</div>';
+        return;
+    }
+
+    var html = '';
+    mountedNames.forEach(function(name, i) {
+        html += '<div class="wb-manage-row">';
+        html += '<span class="wb-manage-name">🌐 ' + escapeHtml(name) + '</span>';
+        html += '<button class="btn btn-secondary btn-xs" onclick="unmountGlobalWbByIndex(' + i + ')">✕ 关闭</button>';
+        html += '</div>';
+    });
+    listEl.innerHTML = html;
+}
+
+function unmountGlobalWbByIndex(index) {
+    var name = currentMountedWbList[index];
+    if (!name) return;
+    var ctx = getSTContext();
+    if (ctx && typeof ctx.executeSlashCommandsWithOptions === 'function') {
+        try { ctx.executeSlashCommandsWithOptions('/world state=off ' + name, { handleParserErrors: false }); } catch(e) {}
+    }
+    executeSTCommand('/world state=off ' + name);
+    showToast('花园', '已关闭: ' + name);
+    setTimeout(function() { refreshGlobalWorldbooks(); }, 500);
+}
+
+async function getMountedWorldbooks() {
+    var names = [];
+
+    if (typeof getActivatedWorldbooks === 'function') {
+        try {
+            var result = await getActivatedWorldbooks();
+            if (result && Array.isArray(result)) names = result;
+        } catch(e) {}
+    }
+
+    if (names.length === 0) {
+        try {
+            if (typeof getActiveWorldInfoNames === 'function') {
+                var result = getActiveWorldInfoNames();
+                if (result && Array.isArray(result)) names = result;
+            }
+        } catch(e) {}
+    }
+
+    var ctx = getSTContext();
+    if (names.length === 0 && ctx) {
+        try {
+            if (ctx.worldInfo && Array.isArray(ctx.worldInfo)) {
+                names = ctx.worldInfo;
+            } else if (ctx.character && ctx.character.data && ctx.character.data.world) {
+                var w = ctx.character.data.world;
+                if (Array.isArray(w)) names = w.map(function(item) { return typeof item === 'string' ? item : item.name || ''; }).filter(Boolean);
+            }
+        } catch(e) {}
+    }
+
+    if (names.length === 0 && window.parent && window.parent.SillyTavern) {
+        try {
+            var st = window.parent.SillyTavern;
+            if (st.worldInfo && Array.isArray(st.worldInfo)) {
+                names = st.worldInfo;
+            }
+        } catch(e) {}
+    }
+
+    return names.filter(function(n) { return n && typeof n === 'string'; });
+}
+
+function unmountWorldbookFromGlobal(name) {
+    var ctx = getSTContext();
+    if (ctx && typeof ctx.executeSlashCommandsWithOptions === 'function') {
+        try { ctx.executeSlashCommandsWithOptions('/world state=off ' + name, { handleParserErrors: false }); } catch(e) {}
+    }
+    executeSTCommand('/world state=off ' + name);
+    showToast('花园', '已关闭: ' + name);
+    setTimeout(function() { refreshGlobalWorldbooks(); }, 500);
+}
+
+function clearAllGlobalWorldbooks() {
+    if (!confirm('确定要清空所有全局挂载的世界书吗？')) return;
+
+    var ctx = getSTContext();
+    if (ctx && typeof ctx.executeSlashCommandsWithOptions === 'function') {
+        try { ctx.executeSlashCommandsWithOptions('/world state=off', { handleParserErrors: false }); } catch(e) {}
+    }
+    executeSTCommand('/world state=off');
+    showToast('花园', '已清空所有全局挂载的世界书');
+    setTimeout(function() { refreshGlobalWorldbooks(); }, 500);
+}
+
 function openViewStartModal() {
     if (!currentCardData) return;
 
@@ -511,8 +690,9 @@ function resolveHelperAPI() {
     var createEntry = typeof createLorebookEntry === 'function' ? createLorebookEntry : null;
     var setEntries = typeof setLorebookEntries === 'function' ? setLorebookEntries : null;
     var getLBs = typeof getLorebooks === 'function' ? getLorebooks : null;
-    console.log('[花园] 前端助手API: createLorebook=' + !!createLB + ' createEntry=' + !!createEntry + ' setEntries=' + !!setEntries + ' getLBs=' + !!getLBs);
-    return { createLorebook: createLB, createEntry: createEntry, setEntries: setEntries, getLorebooks: getLBs };
+    var deleteLB = typeof deleteLorebook === 'function' ? deleteLorebook : null;
+    console.log('[花园] 前端助手API: createLorebook=' + !!createLB + ' createEntry=' + !!createEntry + ' setEntries=' + !!setEntries + ' getLBs=' + !!getLBs + ' deleteLB=' + !!deleteLB);
+    return { createLorebook: createLB, createEntry: createEntry, setEntries: setEntries, getLorebooks: getLBs, deleteLorebook: deleteLB };
 }
 
 function resolveWorldbookAPI() {

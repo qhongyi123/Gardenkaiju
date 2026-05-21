@@ -22,6 +22,7 @@
         <button class="tab-btn" onclick="switchTab('tab4')">投稿开局</button>
         <button class="tab-btn" onclick="switchTab('tab6')">投稿角色</button>
         <button class="tab-btn" onclick="switchTab('tab7')">Mod</button>
+        <button class="tab-btn" onclick="switchTab('tab8')">额外内容管理</button>
         <button class="tab-btn" onclick="switchTab('tab5')">设置</button>
     </div>
 
@@ -63,6 +64,30 @@
     <div id="tab7" class="tab-content">
         <div class="card-grid" id="mod-cards-grid"></div>
         <button class="fav-toggle" id="fav-toggle-mods" onclick="toggleFavoritesView('mods')">📁 收藏夹</button>
+    </div>
+
+    <div id="tab8" class="tab-content">
+        <div class="wb-manage-section">
+            <div class="wb-manage-header">
+                <h3>📚 已创建的世界书（XX的世界书）</h3>
+                <button class="btn btn-secondary btn-sm" onclick="refreshCreatedWorldbooks()">🔄 刷新</button>
+            </div>
+            <div class="wb-manage-list" id="wb-created-list">
+                <div class="wb-manage-empty">点击刷新按钮加载列表...</div>
+            </div>
+        </div>
+        <div class="wb-manage-section">
+            <div class="wb-manage-header">
+                <h3>🌐 当前全局挂载</h3>
+                <div class="wb-manage-header-actions">
+                    <button class="btn btn-danger btn-sm" onclick="clearAllGlobalWorldbooks()">🗑 一键清空</button>
+                    <button class="btn btn-secondary btn-sm" onclick="refreshGlobalWorldbooks()">🔄 刷新</button>
+                </div>
+            </div>
+            <div class="wb-manage-list" id="wb-global-list">
+                <div class="wb-manage-empty">点击刷新按钮加载列表...</div>
+            </div>
+        </div>
     </div>
 
     <div id="tab5" class="tab-content">
@@ -225,7 +250,6 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-success" onclick="createCharacterWorldbook()">📝 创建世界书</button>
                 <button class="btn btn-secondary" onclick="mountCharacterGlobal()">🌐 挂载到全局</button>
                 <button class="btn btn-primary" onclick="closeModal('character-modal')">关闭</button>
             </div>
@@ -285,7 +309,6 @@
                 </div>
             </div>
             <div class="modal-actions">
-                <button class="btn btn-success" onclick="createModWorldbook()">📝 创建世界书</button>
                 <button class="btn btn-secondary" onclick="mountModGlobal()">🌐 挂载到全局</button>
                 <button class="btn btn-primary" onclick="closeModal('mod-modal')">关闭</button>
             </div>
