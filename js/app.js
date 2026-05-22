@@ -963,14 +963,9 @@ function collectAssociatedItems(cardData) {
             items.push({type: 'character', name: name});
         });
     }
-    if (cardData.related_gameplay && Array.isArray(cardData.related_gameplay)) {
-        cardData.related_gameplay.forEach(function(name) {
-            items.push({type: 'gameplay', name: name});
-        });
-    }
-    if (cardData.related_knowledge && Array.isArray(cardData.related_knowledge)) {
-        cardData.related_knowledge.forEach(function(name) {
-            items.push({type: 'knowledge', name: name});
+    if (cardData.related_mod && Array.isArray(cardData.related_mod)) {
+        cardData.related_mod.forEach(function(name) {
+            items.push({type: 'mod', name: name});
         });
     }
     return items;
@@ -1027,12 +1022,9 @@ function renderAssociatedTable() {
         if (item.type === 'character') {
             typeClass = 'row-type-char';
             typeLabel = '人物';
-        } else if (item.type === 'gameplay') {
-            typeClass = 'row-type-gameplay';
-            typeLabel = '玩法';
         } else {
-            typeClass = 'row-type-knowledge';
-            typeLabel = '知识';
+            typeClass = 'row-type-mod';
+            typeLabel = 'Mod';
         }
 
         var indicatorClass = item.hasWorldbook ? 'green' : 'red';
@@ -1091,6 +1083,12 @@ async function createAssociatedWorldbook(index) {
     if (item.type === 'character' && characterMap[item.name]) {
         var ch = characterMap[item.name];
         await addCharacterEntry(ch, item.worldbookName);
+    }
+    if (item.type === 'mod') {
+        var mod = modCardsData.find(function(m) { return m._filename === item.name; });
+        if (mod) {
+            await addModEntry(mod, item.worldbookName);
+        }
     }
 
     item.hasWorldbook = true;

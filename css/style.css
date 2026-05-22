@@ -1106,6 +1106,10 @@ body {
     background: #fff3e0;
     color: #e65100;
 }
+.row-type-mod {
+    background: #e8f5e9;
+    color: #2e7d32;
+}
 
 .associated-row .row-name {
     flex: 1;
