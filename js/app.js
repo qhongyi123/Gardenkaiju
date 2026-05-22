@@ -25,7 +25,13 @@ function switchTab(tabId) {
         }
     });
     if (activeBtn) {
-        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+        var nav = activeBtn.closest('.tabs-nav');
+        if (nav) {
+            var btnLeft = activeBtn.offsetLeft;
+            var btnWidth = activeBtn.offsetWidth;
+            var navWidth = nav.offsetWidth;
+            nav.scrollTo({ left: btnLeft - (navWidth - btnWidth) / 2, behavior: 'smooth' });
+        }
     }
 
     var isCardTab = (tabId === 'tab3' || tabId === 'tab4' || tabId === 'tab6' || tabId === 'tab7');
