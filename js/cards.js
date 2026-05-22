@@ -7,7 +7,8 @@ var START_CARDS_FILES = [
   'data/starts/s006-园丁一天.json',
   'data/starts/s007-夜色花房.json',
   'data/starts/s008-扩建计划.json',
-  'data/starts/s009-次领域展开.json'
+  'data/starts/s009-次领域展开.json',
+  'data/starts/s0067-闲着没事，和女儿来一炮.json'
 ];
 
 var SUBMISSION_CARDS_FILES = [
@@ -32,5 +33,6 @@ var CHARACTER_CARDS_FILES = [
 var MOD_CARDS_FILES = [
   'data/mods/mod001-花园主题包.json',
   'data/mods/mod002-快捷指令集.json',
-  'data/mods/mod003-骰子扩展.json'
+  'data/mods/mod003-骰子扩展.json',
+  'data/mods/mod0067-彩花的妈妈.json'
 ];
