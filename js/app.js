@@ -17,11 +17,16 @@ function switchTab(tabId) {
     document.querySelectorAll('.tab-btn').forEach(function(btn) { btn.classList.remove('active'); });
     document.getElementById(tabId).classList.add('active');
     var buttons = document.querySelectorAll('.tab-btn');
+    var activeBtn = null;
     buttons.forEach(function(btn) {
         if (btn.getAttribute('onclick') === "switchTab('" + tabId + "')") {
             btn.classList.add('active');
+            activeBtn = btn;
         }
     });
+    if (activeBtn) {
+        activeBtn.scrollIntoView({ behavior: 'smooth', block: 'nearest', inline: 'center' });
+    }
 
     var isCardTab = (tabId === 'tab3' || tabId === 'tab4' || tabId === 'tab6' || tabId === 'tab7');
     var trigger = document.getElementById('filter-trigger');

@@ -114,6 +114,11 @@ body {
     padding: 5px 5px 0 5px;
     overflow-x: auto;
     flex-shrink: 0;
+    -webkit-overflow-scrolling: touch;
+    scrollbar-width: none;
+}
+.tabs-nav::-webkit-scrollbar {
+    display: none;
 }
 
 .tab-btn {
@@ -942,10 +947,10 @@ body {
         gap: 0;
     }
     .tab-btn {
-        flex: 1;
-        padding: 8px 6px;
+        flex: 0 0 auto;
+        padding: 8px 10px;
         font-size: 0.85em;
-        min-width: 50px;
+        min-width: auto;
         border-radius: 8px 8px 0 0;
     }
 
@@ -1214,9 +1219,10 @@ body {
     }
 
     .tab-btn {
-        padding: 6px 4px;
+        flex: 0 0 auto;
+        padding: 6px 8px;
         font-size: 0.72em;
-        min-width: 40px;
+        min-width: auto;
     }
 
     .card-grid {
