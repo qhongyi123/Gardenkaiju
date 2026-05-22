@@ -14,7 +14,8 @@ var SUBMISSION_CARDS_FILES = [
   'data/submissions/sub0037-开局继承百亿和佣兵公司，登上影子帝王的宝座吧！.json',
   'data/submissions/sub0038-东京陷落！雏菊沉没之日！？.json',
   'data/submissions/sub0042-黄毛の薬物侵害：琉璃无惨.json',
-  'data/submissions/sub0043-影子的友谊.json'
+  'data/submissions/sub0043-影子的友谊.json',
+  'data/submissions/sub0044-舔狗琉璃：爱与奉献.json'
 ];
 
 var CHARACTER_CARDS_FILES = [
