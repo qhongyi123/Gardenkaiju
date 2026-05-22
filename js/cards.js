@@ -3,6 +3,7 @@ var START_CARDS_FILES = [
   'data/starts/s002-面对大街上随意撸管的痴女大姐姐，彩花：任何邪恶都将被绳之以法！.json',
   'data/starts/s003-地铁之狼现身！小巡防官危矣！.json',
   'data/starts/s004-全民偶像的生日会？琉璃选妃罢了！.json',
+  'data/starts/s0022-神崎澪的日常涩涩.json',
   'data/starts/s0067-闲着没事，和女儿来一炮.json'
 ];
 
@@ -22,5 +23,6 @@ var CHARACTER_CARDS_FILES = [
 ];
 
 var MOD_CARDS_FILES = [
+  'data/mods/mod0022-神崎澪涩涩指导.json',
   'data/mods/mod0067-彩花的妈妈.json'
 ];
