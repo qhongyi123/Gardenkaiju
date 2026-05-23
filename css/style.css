@@ -164,6 +164,9 @@ body {
         opacity: 0.5;
         font-size: 0.95em;
         transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+        overflow: hidden;
+        text-overflow: ellipsis;
+        min-width: 40px;
     }
     .tab-btn:hover {
         opacity: 0.75;
@@ -173,6 +176,7 @@ body {
         opacity: 1;
         font-size: 1.15em;
         letter-spacing: 1px;
+        overflow: visible;
     }
 }
 
