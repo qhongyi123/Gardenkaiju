@@ -158,6 +158,24 @@ body {
     gap: 15px;
 }
 
+@media (min-width: 769px) {
+    .tab-btn {
+        flex: 0.5;
+        opacity: 0.5;
+        font-size: 0.95em;
+        transition: all 0.35s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+    .tab-btn:hover {
+        opacity: 0.75;
+    }
+    .tab-btn.active {
+        flex: 1.5;
+        opacity: 1;
+        font-size: 1.15em;
+        letter-spacing: 1px;
+    }
+}
+
 .preface-section {
     background: #f6fdf6;
     border-radius: 12px;
