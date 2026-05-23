@@ -51,6 +51,9 @@ function switchTab(tabId) {
         refreshCreatedWorldbooks();
         refreshGlobalWorldbooks();
     }
+    if (tabId === 'tab9') {
+        fetchAndDisplayWorldviewEntries();
+    }
     if (isCardTab) {
         if (tabId === 'tab3') {
             updateFavToggleCount('starts');
@@ -1540,6 +1543,148 @@ async function loadHistory() {
     historyEl.textContent = '📝 此处填写花园历史，稍后填入';
 }
 
+// ==================== 世界观调整 ====================
+var WORLDVIEW_LOREBOOK_NAME = '花园巡防官';
+
+var worldviewPresets = {
+    restoreDefault: {
+        name: '恢复默认',
+        uidsToEnable: [4],
+        uidsToDisable: [5, 6, 7, 9, 15, 24, 33, 46, 59, 72, 87, 17, 26, 35, 48, 61, 74, 89, 19, 28, 37, 50, 63, 76, 91]
+    },
+    orcEquality: {
+        name: '兽人世界观（种族平等）',
+        uidsToEnable: [5, 9, 15, 24, 33, 46, 59, 72, 87],
+        uidsToDisable: [4, 6, 7, 17, 26, 35, 48, 61, 74, 89, 19, 28, 37, 50, 63, 76, 91]
+    },
+    orcSlave: {
+        name: '兽人世界观（俯身为奴）',
+        uidsToEnable: [6, 9, 17, 26, 35, 48, 61, 74, 89],
+        uidsToDisable: [4, 5, 7, 15, 24, 33, 46, 59, 72, 87, 19, 28, 37, 50, 63, 76, 91]
+    },
+    orcDomination: {
+        name: '兽人世界观（兽人主宰）',
+        uidsToEnable: [7, 9, 19, 28, 37, 50, 63, 76, 91],
+        uidsToDisable: [4, 5, 6, 15, 24, 33, 46, 59, 72, 87, 17, 26, 35, 48, 61, 74, 89]
+    }
+};
+
+function renderWorldviewButtons() {
+    var container = document.getElementById('worldview-preset-buttons');
+    if (!container) return;
+
+    var html = '';
+    Object.keys(worldviewPresets).forEach(function(key) {
+        var preset = worldviewPresets[key];
+        var btnClass = (key === 'restoreDefault') ? 'btn-primary' : 'btn-secondary';
+        html += '<button class="btn worldview-btn ' + btnClass + '" onclick="applyWorldviewPreset(\'' + key + '\', this)">' + preset.name + '</button>';
+    });
+    container.innerHTML = html;
+}
+
+async function applyWorldviewPreset(presetKey, buttonElement) {
+    var preset = worldviewPresets[presetKey];
+    if (!preset) return;
+
+    var originalText = buttonElement.textContent;
+    buttonElement.disabled = true;
+    buttonElement.textContent = '⏳ 应用' + preset.name + '中...';
+
+    try {
+        var entriesToUpdate = [];
+        preset.uidsToEnable.forEach(function(uid) {
+            entriesToUpdate.push({ uid: uid, enabled: true });
+        });
+        preset.uidsToDisable.forEach(function(uid) {
+            entriesToUpdate.push({ uid: uid, enabled: false });
+        });
+
+        if (entriesToUpdate.length === 0) {
+            throw new Error('列表为空');
+        }
+
+        var setEntries = typeof setLorebookEntries === 'function' ? setLorebookEntries : null;
+        if (!setEntries) {
+            throw new Error('setLorebookEntries API不可用');
+        }
+
+        await setEntries(WORLDVIEW_LOREBOOK_NAME, entriesToUpdate);
+
+        buttonElement.textContent = '✅ 应用成功!';
+        buttonElement.style.background = '#5dd5a1';
+        setTimeout(function() {
+            buttonElement.textContent = originalText;
+            buttonElement.disabled = false;
+            buttonElement.style.background = '';
+        }, 2000);
+
+    } catch (error) {
+        console.error('世界观预设应用失败:', error);
+        buttonElement.textContent = '❌ 应用失败';
+        buttonElement.style.background = '#ff7675';
+        setTimeout(function() {
+            buttonElement.textContent = originalText;
+            buttonElement.disabled = false;
+            buttonElement.style.background = '';
+            showToast('花园', '世界观调整失败: ' + (error.message || '未知错误'));
+        }, 3000);
+    }
+}
+
+function toggleWorldviewDirectory() {
+    var header = document.querySelector('.worldview-directory-header');
+    var container = document.getElementById('worldview-entry-list-container');
+    var arrow = document.getElementById('worldview-directory-arrow');
+    if (!header || !container || !arrow) return;
+
+    var isOpen = container.classList.contains('open');
+    if (isOpen) {
+        header.classList.remove('open');
+        container.classList.remove('open');
+        arrow.textContent = '▶';
+    } else {
+        header.classList.add('open');
+        container.classList.add('open');
+        arrow.textContent = '▼';
+    }
+}
+
+async function fetchAndDisplayWorldviewEntries() {
+    var listElement = document.getElementById('worldview-entry-list');
+    if (!listElement) return;
+
+    listElement.innerHTML = '<p class="worldview-loading-text">⏳ 加载中...</p>';
+
+    try {
+        var getEntries = typeof getLorebookEntries === 'function' ? getLorebookEntries : null;
+        if (!getEntries) {
+            listElement.innerHTML = '<p class="worldview-loading-text">前端助手API不可用，无法加载条目</p>';
+            return;
+        }
+
+        var entries = await getEntries(WORLDVIEW_LOREBOOK_NAME, { fields: ['uid', 'comment', 'enabled'] });
+        if (!entries || entries.length === 0) {
+            listElement.innerHTML = '<p class="worldview-loading-text">未找到条目或世界书"' + WORLDVIEW_LOREBOOK_NAME + '"不存在</p>';
+            return;
+        }
+
+        var html = '';
+        entries.forEach(function(entry) {
+            var enabledClass = entry.enabled ? 'worldview-entry-enabled' : 'worldview-entry-disabled';
+            var statusIcon = entry.enabled ? '🟢' : '⚪';
+            html += '<div class="worldview-entry-item ' + enabledClass + '">';
+            html += '<span class="worldview-entry-uid">' + entry.uid + '</span>';
+            html += '<span class="worldview-entry-comment">' + (entry.comment || '(无标题)') + '</span>';
+            html += '<span class="worldview-entry-status">' + statusIcon + '</span>';
+            html += '</div>';
+        });
+        listElement.innerHTML = html;
+    } catch (error) {
+        console.error('加载世界观条目失败:', error);
+        listElement.innerHTML = '<p class="worldview-loading-text">加载目录失败</p>';
+    }
+}
+
 document.addEventListener('DOMContentLoaded', async function() {
     startCardsData = await loadCards(START_CARDS_FILES);
     submissionCardsData = await loadCards(SUBMISSION_CARDS_FILES);
@@ -1555,6 +1700,7 @@ document.addEventListener('DOMContentLoaded', async function() {
     loadPreface();
     loadHistory();
     initSettings();
+    renderWorldviewButtons();
     updateFavToggleCount('starts');
     updateFavToggleCount('subs');
     updateFavToggleCount('chars');

@@ -18,6 +18,7 @@
     <div class="tabs-nav">
         <button class="tab-btn active" onclick="switchTab('tab1')">前言</button>
         <button class="tab-btn" onclick="switchTab('tab2')">花园历史</button>
+        <button class="tab-btn" onclick="switchTab('tab9')">世界观调整</button>
         <button class="tab-btn" onclick="switchTab('tab3')">开局</button>
         <button class="tab-btn" onclick="switchTab('tab4')">投稿开局</button>
         <button class="tab-btn" onclick="switchTab('tab6')">投稿角色</button>
@@ -43,6 +44,27 @@
     <div id="tab2" class="tab-content">
         <div class="history-placeholder" id="history-content">
             📝 加载中...
+        </div>
+    </div>
+
+    <div id="tab9" class="tab-content">
+        <div class="worldview-section">
+            <div class="worldview-header">
+                <h3>🔮 世界观调整</h3>
+                <p>世界书：花园巡防官</p>
+            </div>
+            <div class="worldview-preset-buttons" id="worldview-preset-buttons"></div>
+            <div class="worldview-directory">
+                <div class="worldview-directory-header" onclick="toggleWorldviewDirectory()">
+                    <h4>条目一览</h4>
+                    <span class="directory-arrow" id="worldview-directory-arrow">▶</span>
+                </div>
+                <div class="worldview-entry-list-container" id="worldview-entry-list-container">
+                    <div class="worldview-entry-list" id="worldview-entry-list">
+                        <p class="worldview-loading-text">点击刷新按钮加载目录...</p>
+                    </div>
+                </div>
+            </div>
         </div>
     </div>
 

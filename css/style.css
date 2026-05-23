@@ -1257,7 +1257,159 @@ body {
     }
 }
 
-/* ==================== 世界书管理 ==================== */
+/* ==================== 世界观调整 ==================== */
+.worldview-section {
+    background: #f6fdf6;
+    border-radius: 12px;
+    padding: 20px;
+    border: 1px solid var(--color-border);
+    font-family: var(--font-content);
+}
+
+.worldview-header {
+    text-align: center;
+    margin-bottom: 18px;
+    padding-bottom: 12px;
+    border-bottom: 2px dotted var(--color-border);
+}
+
+.worldview-header h3 {
+    margin: 0;
+    color: var(--color-primary-dark);
+    font-family: var(--font-main);
+    font-size: 1.4em;
+}
+
+.worldview-header p {
+    margin: 6px 0 0;
+    color: var(--color-text-light);
+    font-size: 0.9em;
+}
+
+.worldview-preset-buttons {
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 18px;
+}
+
+.worldview-btn {
+    width: 100%;
+}
+
+.worldview-directory {
+    border-top: 2px dotted var(--color-border);
+    padding-top: 12px;
+}
+
+.worldview-directory-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    cursor: pointer;
+    padding: 10px 14px;
+    border: 2px dashed var(--color-border);
+    border-radius: 12px;
+    transition: background 0.3s;
+    font-family: var(--font-main);
+}
+
+.worldview-directory-header:hover {
+    background: #fff5f7;
+}
+
+.worldview-directory-header h4 {
+    margin: 0;
+    color: var(--color-text-dark, #6d5d6e);
+    font-size: 1em;
+}
+
+.worldview-directory-header .directory-arrow {
+    font-size: 1.2em;
+    color: var(--color-accent);
+    transition: transform 0.3s;
+}
+
+.worldview-entry-list-container {
+    max-height: 0;
+    overflow: hidden;
+    transition: max-height 0.4s ease-in-out;
+    margin: 0 6px;
+}
+
+.worldview-entry-list-container.open {
+    max-height: 400px;
+    overflow-y: auto;
+    margin-top: 12px;
+    padding: 10px;
+    border: 2px dashed var(--color-border);
+    border-radius: 0 0 10px 10px;
+}
+
+.worldview-entry-list-container::-webkit-scrollbar {
+    width: 6px;
+}
+
+.worldview-entry-list-container::-webkit-scrollbar-thumb {
+    background: var(--color-accent);
+    border-radius: 8px;
+}
+
+.worldview-entry-item {
+    display: flex;
+    align-items: center;
+    padding: 8px 10px;
+    border-radius: 8px;
+    transition: background 0.2s;
+}
+
+.worldview-entry-item:not(:last-child) {
+    margin-bottom: 4px;
+}
+
+.worldview-entry-item:hover {
+    background: #f0f8f0;
+}
+
+.worldview-entry-uid {
+    background: var(--color-accent);
+    color: white;
+    padding: 3px 9px;
+    border-radius: 8px;
+    font-weight: bold;
+    margin-right: 12px;
+    min-width: 30px;
+    text-align: center;
+    font-size: 0.9em;
+}
+
+.worldview-entry-comment {
+    flex: 1;
+    color: var(--color-text-light);
+    font-size: 0.85em;
+    word-break: break-all;
+}
+
+.worldview-entry-status {
+    margin-left: 8px;
+    font-size: 0.85em;
+    flex-shrink: 0;
+}
+
+.worldview-entry-disabled .worldview-entry-comment {
+    opacity: 0.5;
+}
+
+.worldview-entry-disabled .worldview-entry-uid {
+    background: #ccc;
+}
+
+.worldview-loading-text {
+    text-align: center;
+    color: var(--color-text-light);
+    font-size: 0.85em;
+    padding: 16px;
+}
 .wb-manage-section {
     background: #f6fdf6;
     border-radius: 12px;
@@ -1358,5 +1510,25 @@ body {
     }
     .wb-manage-name {
         font-size: 0.8em;
+    }
+}
+
+@media (max-width: 768px) {
+    .worldview-section {
+        padding: 12px;
+    }
+    .worldview-header h3 {
+        font-size: 1.1em;
+    }
+    .worldview-entry-item {
+        padding: 6px 8px;
+    }
+    .worldview-entry-uid {
+        padding: 2px 7px;
+        font-size: 0.8em;
+        min-width: 24px;
+    }
+    .worldview-entry-comment {
+        font-size: 0.78em;
     }
 }
