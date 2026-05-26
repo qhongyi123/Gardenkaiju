@@ -7,6 +7,7 @@ var START_CARDS_FILES = [
   'data/starts/s0013-星宫的三周年演出.json',
   'data/starts/s0016-巫依与噩恋的小日常.json',
   'data/starts/s0022-神崎澪的日常涩涩.json',
+  'data/starts/s0023-雌小鬼主教的欠揍日常.json',
   'data/starts/s0067-闲着没事，和女儿来一炮.json'
 ];
 
