@@ -28,6 +28,6 @@ var CHARACTER_CARDS_FILES = [
 ];
 
 var MOD_CARDS_FILES = [
-  'data/mods/mod0022-神崎澪涩涩指导.json',
+  'data/mods/mod0022-神崎澪的涩涩指导.json',
   'data/mods/mod0067-彩花的妈妈.json'
 ];
