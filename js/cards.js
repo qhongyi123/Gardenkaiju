@@ -5,6 +5,7 @@ var START_CARDS_FILES = [
   'data/starts/s004-全民偶像的生日会？琉璃选妃罢了！.json',
   'data/starts/s005-千奈和桔梗的约会.json',
   'data/starts/s0013-星宫的三周年演出.json',
+  'data/starts/s0016-巫依与噩恋的小日常.json',
   'data/starts/s0022-神崎澪的日常涩涩.json',
   'data/starts/s0067-闲着没事，和女儿来一炮.json'
 ];
