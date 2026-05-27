@@ -4,6 +4,7 @@ var START_CARDS_FILES = [
   'data/starts/s003-地铁之狼现身！小巡防官危矣！.json',
   'data/starts/s004-全民偶像的生日会？琉璃选妃罢了！.json',
   'data/starts/s005-千奈和桔梗的约会.json',
+  'data/starts/s009-夜樱优香的暑期狩猎.json',
   'data/starts/s0013-星宫的三周年演出.json',
   'data/starts/s0016-巫依与噩恋的小日常.json',
   'data/starts/s0022-神崎澪的日常涩涩.json',
