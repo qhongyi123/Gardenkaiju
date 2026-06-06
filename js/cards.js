@@ -9,6 +9,7 @@ var START_CARDS_FILES = [
   'data/starts/s0011-教主降临！身份暴露？身为主教的她将何去何从？.json',
   'data/starts/s0013-星宫的三周年演出.json',
   'data/starts/s0016-巫依与噩恋的小日常.json',
+  'data/starts/s0018-巡防长官决定躺平，这是她肉棒发生的变化…….json',
   'data/starts/s0022-神崎澪的日常涩涩.json',
   'data/starts/s0023-雌小鬼主教的欠揍日常.json',
   'data/starts/s0044-夜央悠主教转化几个巡防官玩玩.json',
