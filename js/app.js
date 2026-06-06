@@ -1303,23 +1303,29 @@ function parseQyText() {
         return;
     }
 
-    var qyRegex = /<qy>\s*([\s\S]*?)\s*<\/qy>/i;
-    var match = raw.match(qyRegex);
-
-    if (match) {
-        parsedContentRaw = raw;
-        parsedContent = match[1];
-    } else {
-        parsedContentRaw = '<qy>\n' + raw + '\n</qy>';
+    if (procType === 'mod') {
         parsedContent = raw;
+        parsedContentRaw = raw;
+    } else {
+        var qyRegex = /<qy>\s*([\s\S]*?)\s*<\/qy>/i;
+        var match = raw.match(qyRegex);
+        if (match) {
+            parsedContentRaw = raw;
+            parsedContent = match[1];
+        } else {
+            parsedContentRaw = '<qy>\n' + raw + '\n</qy>';
+            parsedContent = raw;
+        }
     }
 
     var lines = [];
     lines.push('--- content（纯文本，已去标签）---');
     lines.push(parsedContent.substring(0, 500) + (parsedContent.length > 500 ? '\n...（截断预览）' : ''));
-    lines.push('');
-    lines.push('--- content_raw（保留标签）---');
-    lines.push(parsedContentRaw.substring(0, 300) + (parsedContentRaw.length > 300 ? '\n...（截断预览）' : ''));
+    if (procType !== 'mod') {
+        lines.push('');
+        lines.push('--- content_raw（保留标签）---');
+        lines.push(parsedContentRaw.substring(0, 300) + (parsedContentRaw.length > 300 ? '\n...（截断预览）' : ''));
+    }
     preview.textContent = lines.join('\n');
 }
 
