@@ -1276,8 +1276,20 @@ function setProcType(type) {
     procType = type;
     var startBtn = document.getElementById('proc-type-start');
     var subBtn = document.getElementById('proc-type-sub');
+    var modBtn = document.getElementById('proc-type-mod');
     if (startBtn) startBtn.classList.toggle('active', type === 'start');
     if (subBtn) subBtn.classList.toggle('active', type === 'sub');
+    if (modBtn) modBtn.classList.toggle('active', type === 'mod');
+    var posSection = document.getElementById('proc-position-section');
+    if (posSection) posSection.style.display = (type === 'mod') ? '' : 'none';
+}
+
+function toggleProcDepthFields() {
+    var typeEl = document.getElementById('proc-position-type');
+    var depthDiv = document.getElementById('proc-depth-fields');
+    if (typeEl && depthDiv) {
+        depthDiv.style.display = (typeEl.value === 'at_depth') ? '' : 'none';
+    }
 }
 
 function parseQyText() {
@@ -1349,14 +1361,27 @@ function exportStartJson() {
     if (author) obj.author = author;
     if (time) obj.time = time;
     obj.content = content;
-    obj.content_raw = contentRaw;
+    if (procType === 'mod') {
+        var posType = document.getElementById('proc-position-type');
+        var posOrder = document.getElementById('proc-position-order');
+        var posRole = document.getElementById('proc-position-role');
+        var posDepth = document.getElementById('proc-position-depth');
+        var position = { type: posType ? posType.value : 'at_depth', order: parseInt(posOrder ? posOrder.value : 0) || 0 };
+        if (position.type === 'at_depth') {
+            position.role = posRole ? posRole.value : 'system';
+            position.depth = parseInt(posDepth ? posDepth.value : 4) || 4;
+        }
+        obj.position = position;
+    } else {
+        obj.content_raw = contentRaw;
+    }
     if (relatedChars.length > 0) obj.related_characters = relatedChars;
     if (relatedMods.length > 0) obj.related_mod = relatedMods;
 
     var jsonStr = JSON.stringify(obj, null, 2);
 
     var paddedId = String(id).padStart(4, '0');
-    var prefix = procType === 'sub' ? 'sub' : 's';
+    var prefix = procType === 'sub' ? 'sub' : procType === 'mod' ? 'mod' : 's';
     var filename = prefix + paddedId + '-' + name + '.json';
 
     var blob = new Blob([jsonStr], { type: 'application/json;charset=utf-8' });
@@ -1390,6 +1415,16 @@ function resetProcPanel() {
     document.getElementById('proc-image').value = '';
     document.getElementById('proc-related-chars').value = '';
     document.getElementById('proc-related-mods').value = '';
+    var posType = document.getElementById('proc-position-type');
+    if (posType) { posType.value = 'at_depth'; }
+    var posOrder = document.getElementById('proc-position-order');
+    if (posOrder) posOrder.value = '0';
+    var posRole = document.getElementById('proc-position-role');
+    if (posRole) posRole.value = 'system';
+    var posDepth = document.getElementById('proc-position-depth');
+    if (posDepth) posDepth.value = '4';
+    var depthFields = document.getElementById('proc-depth-fields');
+    if (depthFields) depthFields.style.display = '';
     parsedContentRaw = '';
     parsedContent = '';
     var preview = document.getElementById('proc-preview-content');

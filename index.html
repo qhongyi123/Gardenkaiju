@@ -207,6 +207,7 @@
                     <span class="proc-label">类型</span>
                     <button class="proc-type-btn active" id="proc-type-start" onclick="setProcType('start')">正常开局</button>
                     <button class="proc-type-btn" id="proc-type-sub" onclick="setProcType('sub')">投稿开局</button>
+                    <button class="proc-type-btn" id="proc-type-mod" onclick="setProcType('mod')">Mod</button>
                 </div>
                 <div class="proc-form-row">
                     <span class="proc-label">编号</span>
@@ -246,6 +247,30 @@
                 <div class="proc-form-row">
                     <span class="proc-label">关联Mod</span>
                     <input type="text" id="proc-related-mods" class="proc-input" placeholder="选填，用逗号分隔">
+                </div>
+            </div>
+
+            <div class="proc-section" id="proc-position-section" style="display:none">
+                <h4>📍 插入位置</h4>
+                <div class="proc-form-row">
+                    <span class="proc-label">位置</span>
+                    <select id="proc-position-type" class="proc-select" onchange="toggleProcDepthFields()">
+                        <option value="before_char">角色定义前</option>
+                        <option value="after_char">角色定义后</option>
+                        <option value="at_depth" selected>系统提示中</option>
+                    </select>
+                    <span class="proc-label">顺序</span>
+                    <input type="number" id="proc-position-order" class="proc-input proc-input-sm" value="0" min="0" max="9999">
+                </div>
+                <div class="proc-form-row" id="proc-depth-fields">
+                    <span class="proc-label">角色</span>
+                    <select id="proc-position-role" class="proc-select">
+                        <option value="system">system</option>
+                        <option value="assistant">assistant</option>
+                        <option value="user">user</option>
+                    </select>
+                    <span class="proc-label">深度</span>
+                    <input type="number" id="proc-position-depth" class="proc-input proc-input-sm" value="4" min="0" max="99">
                 </div>
             </div>
 
