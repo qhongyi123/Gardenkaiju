@@ -36,5 +36,6 @@ var CHARACTER_CARDS_FILES = [
 var MOD_CARDS_FILES = [
   'data/mods/mod0018-{{user}}的设定-1.json',
   'data/mods/mod0022-神崎澪的涩涩指导.json',
-  'data/mods/mod0067-彩花的妈妈.json'
+  'data/mods/mod0067-彩花的妈妈.json',
+  'data/mods/mod0069-伪娘设定.json'
 ];
