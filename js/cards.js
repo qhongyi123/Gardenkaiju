@@ -38,6 +38,7 @@ var MOD_CARDS_FILES = [
   'data/mods/mod0018-{{user}}的设定-1.json',
   'data/mods/mod0019-{{user}}的设定-2.json',
   'data/mods/mod0022-神崎澪的涩涩指导.json',
+  'data/mods/mod0066-花园婚恋法与惩戒法.json',
   'data/mods/mod0067-彩花的妈妈.json',
   'data/mods/mod0069-伪娘设定.json'
 ];
