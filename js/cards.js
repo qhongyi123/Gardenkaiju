@@ -7,6 +7,7 @@ var START_CARDS_FILES = [
   'data/starts/s009-夜樱优香的暑期狩猎.json',
   'data/starts/s0010-继承了堕天使之体的她，会遇到自己的救赎吗.json',
   'data/starts/s0011-教主降临！身份暴露？身为主教的她将何去何从？.json',
+  'data/starts/s0012-被捉奸后，我的宠物生活绝不会屈服（应该吧）.json',
   'data/starts/s0013-星宫的三周年演出.json',
   'data/starts/s0016-巫依与噩恋的小日常.json',
   'data/starts/s0018-巡防长官决定躺平，这是她肉棒发生的变化…….json',
@@ -37,6 +38,7 @@ var CHARACTER_CARDS_FILES = [
 var MOD_CARDS_FILES = [
   'data/mods/mod0018-{{user}}的设定-1.json',
   'data/mods/mod0019-{{user}}的设定-2.json',
+  'data/mods/mod0020-{{user}}的宠物化清单.json',
   'data/mods/mod0022-神崎澪的涩涩指导.json',
   'data/mods/mod0066-花园婚恋法与惩戒法.json',
   'data/mods/mod0067-彩花的妈妈.json',
