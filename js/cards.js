@@ -9,6 +9,7 @@ var START_CARDS_FILES = [
   'data/starts/s0011-教主降临！身份暴露？身为主教的她将何去何从？.json',
   'data/starts/s0012-被捉奸后，我的宠物生活绝不会屈服（应该吧）.json',
   'data/starts/s0013-星宫的三周年演出.json',
+  'data/starts/s0014-星宫琉璃的南海度假之旅.json',
   'data/starts/s0016-巫依与噩恋的小日常.json',
   'data/starts/s0018-巡防长官决定躺平，这是她肉棒发生的变化…….json',
   'data/starts/s0020-私自弄乱别人家，还用别人内裤自慰的婊子男娘就应该被狠狠羞辱啊！.json',
@@ -43,6 +44,7 @@ var MOD_CARDS_FILES = [
   'data/mods/mod0019-{{user}}的设定-2.json',
   'data/mods/mod0020-{{user}}的宠物化清单.json',
   'data/mods/mod0022-神崎澪的涩涩指导.json',
+  'data/mods/mod0044-星宫的南海小岛.json',
   'data/mods/mod0066-花园婚恋法与惩戒法.json',
   'data/mods/mod0067-彩花的妈妈.json',
   'data/mods/mod0069-伪娘设定.json'
