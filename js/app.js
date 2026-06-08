@@ -2,6 +2,9 @@ var startCardsData = [];
 var submissionCardsData = [];
 var characterCardsData = [];
 var modCardsData = [];
+var startCollectionData = [];
+var submissionCollectionData = [];
+var modCollectionData = [];
 var characterMap = {};
 var currentCardData = null;
 var bindWorldbook = true;
@@ -86,6 +89,93 @@ function extractFilename(path) {
     return name;
 }
 
+function resolveCollectionItems(collection) {
+    var items = [];
+    if (!collection.items) return items;
+    collection.items.forEach(function(item) {
+        var found = null;
+        if (item.type === 'start') {
+            found = startCardsData.find(function(c) { return c.id === item.id; });
+        } else if (item.type === 'submission') {
+            found = submissionCardsData.find(function(c) { return c.id === item.id; });
+        } else if (item.type === 'mod') {
+            found = modCardsData.find(function(c) { return c.id === item.id; });
+        }
+        if (found) items.push(found);
+    });
+    return items;
+}
+
+function getCollectionsForTab(tabId) {
+    if (tabId === 'tab3') return startCollectionData;
+    if (tabId === 'tab4') return submissionCollectionData;
+    if (tabId === 'tab7') return modCollectionData;
+    return [];
+}
+
+function toggleCollection(collectionEl) {
+    var itemsDiv = collectionEl.querySelector('.collection-items');
+    if (!itemsDiv) return;
+    var isExpanded = itemsDiv.style.display !== 'none';
+    if (isExpanded) {
+        itemsDiv.style.display = 'none';
+        collectionEl.classList.remove('expanded');
+        var icon = collectionEl.querySelector('.collection-icon');
+        if (icon) icon.textContent = '\uD83D\uDCC2';
+    } else {
+        itemsDiv.style.display = '';
+        collectionEl.classList.add('expanded');
+        var icon = collectionEl.querySelector('.collection-icon');
+        if (icon) icon.textContent = '\uD83D\uDCC1';
+    }
+}
+
+function renderCollectionCard(collection, idx, tabId) {
+    var bgClass = collection.color ? 'card-bg-' + collection.color : 'card-bg-soft-rose';
+    var resolvedItems = resolveCollectionItems(collection);
+    var itemCount = resolvedItems.length;
+    var collectionId = 'collection-' + tabId + '-' + idx;
+
+    var html = '<div class="start-card collection-card ' + bgClass + '" data-collection-id="' + collectionId + '">';
+    html += '<div class="card-filename">' + escapeHtml(collection.name) + '</div>';
+    html += '<div class="collection-info">';
+    html += '<span class="collection-icon">\uD83D\uDCC2</span>';
+    html += '<span class="collection-count">' + itemCount + '\u9879</span>';
+    html += '</div>';
+    if (collection.tags && collection.tags.length > 0) {
+        html += '<div class="card-tags">';
+        collection.tags.forEach(function(tag) {
+            html += '<span class="card-tag">#' + escapeHtml(tag) + '</span>';
+        });
+        html += '</div>';
+    } else {
+        html += '<div class="card-tags"></div>';
+    }
+    html += '<div class="collection-items" style="display:none">';
+    resolvedItems.forEach(function(item) {
+        var itemBgClass = item.color ? 'card-bg-' + item.color : 'card-bg-soft-green';
+        var imgClass = item.image ? ' has-image' : '';
+        html += '<div class="start-card collection-item ' + itemBgClass + imgClass + '" data-id="' + item.id + '">';
+        html += '<div class="card-filename">' + escapeHtml(item._filename) + '</div>';
+        if (item.image) {
+            html += '<div class="card-image"><img src="' + escapeHtml(item.image) + '" alt="" loading="lazy"></div>';
+        }
+        if (item.tags && item.tags.length > 0) {
+            html += '<div class="card-tags">';
+            item.tags.forEach(function(tag) {
+                html += '<span class="card-tag">#' + escapeHtml(tag) + '</span>';
+            });
+            html += '</div>';
+        } else {
+            html += '<div class="card-tags"></div>';
+        }
+        html += '</div>';
+    });
+    html += '</div>';
+    html += '</div>';
+    return html;
+}
+
 async function loadCards(fileList) {
     var results = await Promise.all(
         fileList.map(function(path) {
@@ -104,11 +194,24 @@ async function loadCards(fileList) {
     return results.filter(function(c) { return c !== null; });
 }
 
-function renderStartCards(containerId, dataArray) {
+function renderStartCards(containerId, dataArray, collectionData) {
     var container = document.getElementById(containerId);
     if (!container) return;
 
+    var tabId = '';
+    if (containerId === 'start-cards-grid') tabId = 'tab3';
+    else if (containerId === 'submission-cards-grid') tabId = 'tab4';
+    else if (containerId === 'mod-cards-grid') tabId = 'tab7';
+    else if (containerId === 'character-cards-grid') tabId = 'tab6';
+
     var html = '';
+
+    if (collectionData && collectionData.length > 0) {
+        collectionData.forEach(function(collection, idx) {
+            html += renderCollectionCard(collection, idx, tabId);
+        });
+    }
+
     dataArray.forEach(function(card) {
         var bgClass = card.color ? 'card-bg-' + card.color : 'card-bg-soft-green';
         var imgClass = card.image ? ' has-image' : '';
@@ -134,10 +237,52 @@ function renderStartCards(containerId, dataArray) {
     });
     container.innerHTML = html;
 
-    container.querySelectorAll('.start-card').forEach(function(cardEl) {
-        cardEl.addEventListener('click', function() {
+    container.querySelectorAll('.collection-card').forEach(function(cardEl) {
+        cardEl.addEventListener('click', function(e) {
+            if (e.target.closest('.collection-item')) return;
+            toggleCollection(cardEl);
+        });
+    });
+
+    container.querySelectorAll('.start-card:not(.collection-card)').forEach(function(cardEl) {
+        cardEl.addEventListener('click', function(e) {
+            if (e.target.closest('.collection-card')) return;
             var cardId = parseInt(this.getAttribute('data-id'));
             var foundCard = dataArray.find(function(c) { return c.id === cardId; });
+            if (!foundCard && collectionData) {
+                collectionData.forEach(function(col) {
+                    var items = resolveCollectionItems(col);
+                    var item = items.find(function(c) { return c.id === cardId; });
+                    if (item) foundCard = item;
+                });
+            }
+            if (foundCard) {
+                if (containerId === 'character-cards-grid') {
+                    openCharacterModal(foundCard);
+                } else if (containerId === 'mod-cards-grid') {
+                    openModModal(foundCard);
+                } else {
+                    openModal(foundCard);
+                }
+            }
+        });
+    });
+
+    container.querySelectorAll('.collection-item').forEach(function(cardEl) {
+        cardEl.addEventListener('click', function(e) {
+            e.stopPropagation();
+            var cardId = parseInt(this.getAttribute('data-id'));
+            var foundCard = null;
+            if (collectionData) {
+                collectionData.forEach(function(col) {
+                    var items = resolveCollectionItems(col);
+                    var item = items.find(function(c) { return c.id === cardId; });
+                    if (item) foundCard = item;
+                });
+            }
+            if (!foundCard) {
+                foundCard = dataArray.find(function(c) { return c.id === cardId; });
+            }
             if (foundCard) {
                 if (containerId === 'character-cards-grid') {
                     openCharacterModal(foundCard);
@@ -1492,6 +1637,25 @@ function buildTagCloud() {
             });
         }
     });
+    var activeTab = document.querySelector('.tab-content.active');
+    var collData = getCollectionsForTab(activeTab ? activeTab.id : 'tab3');
+    if (collData) {
+        collData.forEach(function(col) {
+            if (col.tags && col.tags.length > 0) {
+                col.tags.forEach(function(tag) {
+                    tagMap[tag] = (tagMap[tag] || 0) + 1;
+                });
+            }
+            var resolved = resolveCollectionItems(col);
+            resolved.forEach(function(item) {
+                if (item.tags && item.tags.length > 0) {
+                    item.tags.forEach(function(tag) {
+                        tagMap[tag] = (tagMap[tag] || 0) + 1;
+                    });
+                }
+            });
+        });
+    }
     var sorted = Object.keys(tagMap).sort(function(a, b) { return tagMap[b] - tagMap[a]; });
 
     var key = getFilterKey();
@@ -1567,14 +1731,48 @@ function applyFilter() {
         return matchTag && matchSearch;
     });
 
-    renderStartCards(containerId, filtered);
+    var collData = getCollectionsForTab(activeTab ? activeTab.id : 'tab3');
+    if (collData && collData.length > 0) {
+        collData = collData.filter(function(col) {
+            var matchTag = true;
+            var matchSearch = !searchText ||
+                (col.name && col.name.toLowerCase().indexOf(searchText) >= 0);
+            if (currentTag) {
+                matchTag = (col.tags && col.tags.indexOf(currentTag) >= 0);
+                if (!matchTag) {
+                    var resolved = resolveCollectionItems(col);
+                    matchTag = resolved.some(function(item) {
+                        return item.tags && item.tags.indexOf(currentTag) >= 0;
+                    });
+                }
+            }
+            if (!matchSearch) {
+                var resolved = resolveCollectionItems(col);
+                matchSearch = resolved.some(function(item) {
+                    return (item._filename && item._filename.toLowerCase().indexOf(searchText) >= 0) ||
+                        (item.content && item.content.toLowerCase().indexOf(searchText) >= 0);
+                });
+            }
+            if (favModeStarts || favModeSubs || favModeMods) {
+                var resolved = resolveCollectionItems(col);
+                var hasFav = resolved.some(function(item) {
+                    var favType = activeTab.id === 'tab3' ? 'starts' : activeTab.id === 'tab4' ? 'subs' : 'mods';
+                    return isFavorited(item.id, favType);
+                });
+                if (!hasFav) return false;
+            }
+            return matchTag && matchSearch;
+        });
+    }
+
+    renderStartCards(containerId, filtered, collData);
 }
 
 function resetAllCards() {
-    renderStartCards('start-cards-grid', startCardsData);
-    renderStartCards('submission-cards-grid', submissionCardsData);
-    renderStartCards('character-cards-grid', characterCardsData);
-    renderStartCards('mod-cards-grid', modCardsData);
+    renderStartCards('start-cards-grid', startCardsData, startCollectionData);
+    renderStartCards('submission-cards-grid', submissionCardsData, submissionCollectionData);
+    renderStartCards('character-cards-grid', characterCardsData, null);
+    renderStartCards('mod-cards-grid', modCardsData, modCollectionData);
 }
 
 var favModeStarts = false;
@@ -1717,28 +1915,28 @@ function refreshCurrentCards() {
             var favIds = getFavorites('starts');
             data = data.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
         }
-        renderStartCards('start-cards-grid', data);
+        renderStartCards('start-cards-grid', data, startCollectionData);
     } else if (activeTab.id === 'tab4') {
         var data = submissionCardsData;
         if (favModeSubs) {
             var favIds = getFavorites('subs');
             data = data.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
         }
-        renderStartCards('submission-cards-grid', data);
+        renderStartCards('submission-cards-grid', data, submissionCollectionData);
     } else if (activeTab.id === 'tab6') {
         var data = characterCardsData;
         if (favModeChars) {
             var favIds = getFavorites('chars');
             data = data.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
         }
-        renderStartCards('character-cards-grid', data);
+        renderStartCards('character-cards-grid', data, null);
     } else if (activeTab.id === 'tab7') {
         var data = modCardsData;
         if (favModeMods) {
             var favIds = getFavorites('mods');
             data = data.filter(function(c) { return favIds.indexOf(c.id) >= 0; });
         }
-        renderStartCards('mod-cards-grid', data);
+        renderStartCards('mod-cards-grid', data, modCollectionData);
     }
 }
 
@@ -1956,13 +2154,16 @@ document.addEventListener('DOMContentLoaded', async function() {
     submissionCardsData = await loadCards(SUBMISSION_CARDS_FILES);
     characterCardsData = await loadCards(CHARACTER_CARDS_FILES);
     modCardsData = await loadCards(MOD_CARDS_FILES);
+    startCollectionData = await loadCards(START_COLLECTION_FILES);
+    submissionCollectionData = await loadCards(SUBMISSION_COLLECTION_FILES);
+    modCollectionData = await loadCards(MOD_COLLECTION_FILES);
     characterCardsData.forEach(function(ch) {
         characterMap[ch._filename] = ch;
     });
-    renderStartCards('start-cards-grid', startCardsData);
-    renderStartCards('submission-cards-grid', submissionCardsData);
-    renderStartCards('character-cards-grid', characterCardsData);
-    renderStartCards('mod-cards-grid', modCardsData);
+    renderStartCards('start-cards-grid', startCardsData, startCollectionData);
+    renderStartCards('submission-cards-grid', submissionCardsData, submissionCollectionData);
+    renderStartCards('character-cards-grid', characterCardsData, null);
+    renderStartCards('mod-cards-grid', modCardsData, modCollectionData);
     loadPreface();
     loadHistory();
     initSettings();

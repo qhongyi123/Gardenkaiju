@@ -45,3 +45,11 @@ var MOD_CARDS_FILES = [
   'data/mods/mod0067-彩花的妈妈.json',
   'data/mods/mod0069-伪娘设定.json'
 ];
+
+var START_COLLECTION_FILES = [
+  'data/collections/collection-涩涩合集.json'
+];
+
+var SUBMISSION_COLLECTION_FILES = [];
+
+var MOD_COLLECTION_FILES = [];
