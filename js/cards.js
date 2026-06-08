@@ -21,6 +21,7 @@ var START_CARDS_FILES = [
 
 var SUBMISSION_CARDS_FILES = [
   'data/submissions/sub0013-扮演焰的妻子，玩视觉剥夺.json',
+  'data/submissions/sub0014-捡到个小堕天使.json',
   'data/submissions/sub0022-邪恶记者.json',
   'data/submissions/sub0035-枯萎教会大侵攻！跟我一起守营！.json',
   'data/submissions/sub0036-枯萎教会大侵攻！是雏菊就防守一百天！.json',
