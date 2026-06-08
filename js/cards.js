@@ -15,7 +15,8 @@ var START_CARDS_FILES = [
   'data/starts/s0022-神崎澪的日常涩涩.json',
   'data/starts/s0023-雌小鬼主教的欠揍日常.json',
   'data/starts/s0044-夜央悠主教转化几个巡防官玩玩.json',
-  'data/starts/s0067-闲着没事，和女儿来一炮.json'
+  'data/starts/s0067-闲着没事，和女儿来一炮.json',
+  'data/starts/s0068-逛游乐场遇到熟人，互相插对方女儿.json'
 ];
 
 var SUBMISSION_CARDS_FILES = [
