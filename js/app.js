@@ -834,10 +834,10 @@ function sendStartContent() {
     var sendText = rawContent;
 
     if (typeof triggerSlash !== 'undefined') {
-        triggerSlash('/sendas name="花园巡防官" ' + sendText);
+        triggerSlash('/sendas name="花园" ' + sendText);
     } else {
         console.log('发送开局内容:', sendText);
-        alert('已尝试以花园巡防官名称发送开局内容。\n\n内容（前50字）：' + rawContent.substring(0, 50) + '...');
+        alert('已尝试以花园名称发送开局内容。\n\n内容（前50字）：' + rawContent.substring(0, 50) + '...');
     }
 }
 
@@ -1406,7 +1406,7 @@ function sendOpeningGeneration() {
     var sendText = lines.join('\n');
 
     if (typeof triggerSlash !== 'undefined') {
-        triggerSlash('/sendas name="花园巡防官" ' + sendText);
+        triggerSlash('/sendas name="花园" ' + sendText);
     } else {
         console.log('发送开局生成请求:', sendText);
         alert('开局生成请求：\n\n' + sendText);
