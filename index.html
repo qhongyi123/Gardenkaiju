@@ -1,474 +1,324 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<base href="https://qhongyi123.github.io/Gardenkaiju/">
-<title>花园</title>
-<!-- disable-default-loading -->
+<base href="https://qhongyi123.github.io/test/">
+<title>《千叶的睡前小故事》 - 开局界面</title>
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <link rel="stylesheet" href="css/style.css">
 </head>
 <body>
 
-<div class="container">
-    <div class="header">
-        <h1>✨ 花园 ✨</h1>
-        <button class="filter-trigger" id="filter-trigger" onclick="toggleFilter()" style="display:none">🔍 筛选</button>
-        <button class="filter-trigger" id="detail-edit-trigger" onclick="toggleDetailEdit()" style="display:none">📝 细致编辑</button>
-    </div>
-
-    <div class="tabs-nav">
-        <button class="tab-btn active" onclick="switchTab('tab1')">前言</button>
-        <button class="tab-btn" onclick="switchTab('tab2')">花园历史</button>
-        <button class="tab-btn" onclick="switchTab('tab9')">世界观调整</button>
-        <button class="tab-btn" onclick="switchTab('tab3')">开局</button>
-        <button class="tab-btn" onclick="switchTab('tab4')">投稿开局</button>
-        <button class="tab-btn" onclick="switchTab('tab6')">投稿角色</button>
-        <button class="tab-btn" onclick="switchTab('tab7')">Mod</button>
-        <button class="tab-btn" onclick="switchTab('tab8')">管理面板</button>
-        <button class="tab-btn" id="dev-tab-btn" onclick="switchTab('tab10')" style="display:none">开局生成</button>
-        <button class="tab-btn" id="dev-tab-btn2" onclick="switchTab('tab11')" style="display:none">开局文本处理</button>
-        <button class="tab-btn" onclick="switchTab('tab5')">设置</button>
-    </div>
-
-    <div class="filter-panel" id="filter-panel">
-        <div class="filter-search-row">
-            <input type="text" id="filter-search" class="filter-search-input" placeholder="搜索开局名称或内容..." oninput="applyFilter()">
-            <button class="filter-close-btn" onclick="toggleFilter()">✕</button>
+<div class="scene" id="scene-cover">
+    <div class="book-cover-container" onclick="openBook()">
+        <div class="cover-border"></div>
+        <div class="title-area">
+            <h1 class="book-title">千叶的睡前小故事</h1>
+            <div class="book-subtitle">&#10023; QIANYE STORY &#10023;</div>
         </div>
-        <div class="filter-tags-row" id="filter-tags"></div>
-    </div>
-
-    <div id="tab1" class="tab-content active">
-        <div class="preface-section" id="preface-content">
-            📖 加载中...
-        </div>
-    </div>
-
-    <div id="tab2" class="tab-content">
-        <div class="history-placeholder" id="history-content">
-            📝 加载中...
-        </div>
-    </div>
-
-    <div id="tab9" class="tab-content">
-        <div class="worldview-section">
-            <div class="worldview-header">
-                <h3>🔮 世界观调整</h3>
-                <p>世界书：花园巡防官</p>
-            </div>
-            <div class="worldview-preset-buttons" id="worldview-preset-buttons"></div>
-            <div class="worldview-directory">
-                <div class="worldview-directory-header" onclick="toggleWorldviewDirectory()">
-                    <h4>条目一览</h4>
-                    <span class="directory-arrow" id="worldview-directory-arrow">▶</span>
-                </div>
-                <div class="worldview-entry-list-container" id="worldview-entry-list-container">
-                    <div class="worldview-entry-list" id="worldview-entry-list">
-                        <p class="worldview-loading-text">点击刷新按钮加载目录...</p>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
-
-    <div id="tab3" class="tab-content">
-        <div class="card-grid" id="start-cards-grid"></div>
-        <button class="fav-toggle" id="fav-toggle-starts" onclick="toggleFavoritesView('starts')">📁 收藏夹</button>
-    </div>
-
-    <div id="tab4" class="tab-content">
-        <div class="card-grid" id="submission-cards-grid"></div>
-        <button class="fav-toggle" id="fav-toggle-subs" onclick="toggleFavoritesView('subs')">📁 收藏夹</button>
-    </div>
-
-    <div id="tab6" class="tab-content">
-        <div class="card-grid" id="character-cards-grid"></div>
-        <button class="fav-toggle" id="fav-toggle-chars" onclick="toggleFavoritesView('chars')">📁 收藏夹</button>
-    </div>
-
-    <div id="tab7" class="tab-content">
-        <div class="card-grid" id="mod-cards-grid"></div>
-        <button class="fav-toggle" id="fav-toggle-mods" onclick="toggleFavoritesView('mods')">📁 收藏夹</button>
-    </div>
-
-    <div id="tab8" class="tab-content">
-        <div class="wb-manage-section">
-            <div class="wb-manage-header">
-                <h3>📚 已创建的世界书（XX的世界书）</h3>
-                <button class="btn btn-secondary btn-sm" onclick="refreshCreatedWorldbooks()">🔄 刷新</button>
-            </div>
-            <div class="wb-manage-list" id="wb-created-list">
-                <div class="wb-manage-empty">点击刷新按钮加载列表...</div>
-            </div>
-        </div>
-        <div class="wb-manage-section">
-            <div class="wb-manage-header">
-                <h3>🌐 当前全局挂载</h3>
-                <div class="wb-manage-header-actions">
-                    <button class="btn btn-danger btn-sm" onclick="clearAllGlobalWorldbooks()">🗑 一键清空</button>
-                    <button class="btn btn-secondary btn-sm" onclick="refreshGlobalWorldbooks()">🔄 刷新</button>
-                </div>
-            </div>
-            <div class="wb-manage-list" id="wb-global-list">
-                <div class="wb-manage-empty">点击刷新按钮加载列表...</div>
-            </div>
-        </div>
-    </div>
-
-    <div id="tab5" class="tab-content">
-        <div class="settings-section">
-            <h3>⚙ 设置</h3>
-            <div class="settings-row">
-                <span class="settings-label">卡片列数：</span>
-                <button class="col-btn" onclick="setColumns(1)">1</button>
-                <button class="col-btn" onclick="setColumns(2)">2</button>
-                <button class="col-btn" onclick="setColumns(3)">3</button>
-                <button class="col-btn" onclick="setColumns(4)">4</button>
-                <button class="col-btn" onclick="setColumns(5)">5</button>
-            </div>
-            <div class="settings-row separated">
-                <span class="settings-label">界面字体字号：</span>
-                <button class="col-btn" onclick="setFontSizeUI(12)">12</button>
-                <button class="col-btn" onclick="setFontSizeUI(16)">16</button>
-                <button class="col-btn" onclick="setFontSizeUI(20)">20</button>
-                <button class="col-btn" onclick="setFontSizeUI(24)">24</button>
-                <button class="col-btn" onclick="setFontSizeUI(28)">28</button>
-                <button class="col-btn" onclick="setFontSizeUI(32)">32</button>
-            </div>
-            <div class="settings-row">
-                <span class="settings-label">卡片字体字号：</span>
-                <button class="col-btn" onclick="setFontSizeCards(12)">12</button>
-                <button class="col-btn" onclick="setFontSizeCards(14)">14</button>
-                <button class="col-btn" onclick="setFontSizeCards(18)">18</button>
-                <button class="col-btn" onclick="setFontSizeCards(22)">22</button>
-                <button class="col-btn" onclick="setFontSizeCards(26)">26</button>
-                <button class="col-btn" onclick="setFontSizeCards(30)">30</button>
-            </div>
-            <div class="settings-row separated">
-                <span class="settings-label">字体：</span>
-                <button class="font-btn" onclick="setFontFamily('kuaile')">花间体</button>
-                <button class="font-btn" onclick="setFontFamily('serif')">书简体</button>
-                <button class="font-btn" onclick="setFontFamily('sans')">云水体</button>
-                <button class="font-btn" onclick="setFontFamily('mashan')">墨痕体</button>
-            </div>
-            <div class="settings-row separated">
-                <span class="settings-label">高级选项：</span>
-                <label class="wb-toggle">
-                    <input type="checkbox" id="setting-show-wb-name" onchange="toggleShowWbName(this.checked)">
-                    <span>显示自定义世界书命名</span>
-                </label>
-            </div>
-            <div class="settings-row separated">
-                <span class="settings-label">开发者模式：</span>
-                <label class="wb-toggle">
-                    <input type="checkbox" id="setting-dev-mode" onchange="toggleDevMode(this.checked)">
-                    <span>开启开发者模式</span>
-                </label>
-            </div>
-        </div>
-    </div>
-
-    <div id="tab10" class="tab-content">
-        <div class="dev-panel">
-            <h3>🎬 开局生成（开发者版）</h3>
-
-            <div class="dev-section">
-                <div class="dev-section-header">
-                    <h4>📋 开场白要求</h4>
-                    <button class="dev-add-btn" onclick="addRequirement()">＋</button>
-                </div>
-                <div class="dev-requirements" id="dev-requirements"></div>
-            </div>
-
-            <div class="dev-section">
-                <h4>📝 剧情填写</h4>
-                <textarea class="dev-plot-textarea" id="dev-plot" placeholder="在此填写剧情内容..."></textarea>
-            </div>
-
-            <div class="dev-actions">
-                <button class="btn btn-success" onclick="sendOpeningGeneration()">🚀 发送生成请求</button>
-                <button class="btn btn-secondary" onclick="resetDevGeneration()">🔄 重置</button>
-            </div>
-        </div>
-    </div>
-
-    <div id="tab11" class="tab-content">
-        <div class="proc-panel">
-            <h3>📄 开局文本处理</h3>
-
-            <div class="proc-section">
-                <h4>📥 粘贴原始文本</h4>
-                <textarea class="proc-textarea" id="proc-raw-input" placeholder="在此粘贴包含 &lt;qy&gt; 标签的开局文本..."></textarea>
-                <button class="btn btn-primary proc-parse-btn" onclick="parseQyText()">🔍 解析文本</button>
-            </div>
-
-            <div class="proc-section">
-                <h4>📋 元数据</h4>
-                <div class="proc-form-row">
-                    <span class="proc-label">类型</span>
-                    <button class="proc-type-btn active" id="proc-type-start" onclick="setProcType('start')">正常开局</button>
-                    <button class="proc-type-btn" id="proc-type-sub" onclick="setProcType('sub')">投稿开局</button>
-                    <button class="proc-type-btn" id="proc-type-mod" onclick="setProcType('mod')">Mod</button>
-                </div>
-                <div class="proc-form-row">
-                    <span class="proc-label">编号</span>
-                    <input type="number" id="proc-id" class="proc-input proc-input-sm" min="1" max="9999" placeholder="如 67">
-                    <span class="proc-label">故事名称</span>
-                    <input type="text" id="proc-name" class="proc-input" placeholder="如 闲着没事，和女儿来一炮">
-                </div>
-                <div class="proc-form-row">
-                    <span class="proc-label">颜色</span>
-                    <select id="proc-color" class="proc-select">
-                        <option value="soft-green">软绿</option>
-                        <option value="soft-blue">软蓝</option>
-                        <option value="soft-lavender">软紫</option>
-                        <option value="soft-peach">软桃</option>
-                        <option value="soft-yellow">软黄</option>
-                        <option value="soft-mint">软薄荷</option>
-                        <option value="soft-rose">软玫瑰</option>
-                        <option value="soft-sky">软天蓝</option>
-                    </select>
-                    <span class="proc-label">标签</span>
-                    <input type="text" id="proc-tags" class="proc-input" placeholder="用逗号分隔，如 花园,日常">
-                </div>
-                <div class="proc-form-row">
-                    <span class="proc-label">作者</span>
-                    <input type="text" id="proc-author" class="proc-input" placeholder="选填">
-                    <span class="proc-label">时间</span>
-                    <input type="text" id="proc-time" class="proc-input" placeholder="选填，如 2025-03">
-                </div>
-                <div class="proc-form-row">
-                    <span class="proc-label">图链</span>
-                    <input type="text" id="proc-image" class="proc-input" placeholder="选填，图片URL">
-                </div>
-                <div class="proc-form-row">
-                    <span class="proc-label">关联人物</span>
-                    <input type="text" id="proc-related-chars" class="proc-input" placeholder="选填，用逗号分隔">
-                </div>
-                <div class="proc-form-row">
-                    <span class="proc-label">关联Mod</span>
-                    <input type="text" id="proc-related-mods" class="proc-input" placeholder="选填，用逗号分隔">
-                </div>
-            </div>
-
-            <div class="proc-section" id="proc-position-section" style="display:none">
-                <h4>📍 插入位置</h4>
-                <div class="proc-form-row">
-                    <span class="proc-label">位置</span>
-                    <select id="proc-position-type" class="proc-select" onchange="toggleProcDepthFields()">
-                        <option value="before_char">角色定义前</option>
-                        <option value="after_char">角色定义后</option>
-                        <option value="at_depth" selected>系统提示中</option>
-                    </select>
-                    <span class="proc-label">顺序</span>
-                    <input type="number" id="proc-position-order" class="proc-input proc-input-sm" value="0" min="0" max="9999">
-                </div>
-                <div class="proc-form-row" id="proc-depth-fields">
-                    <span class="proc-label">角色</span>
-                    <select id="proc-position-role" class="proc-select">
-                        <option value="system">system</option>
-                        <option value="assistant">assistant</option>
-                        <option value="user">user</option>
-                    </select>
-                    <span class="proc-label">深度</span>
-                    <input type="number" id="proc-position-depth" class="proc-input proc-input-sm" value="4" min="0" max="99">
-                </div>
-            </div>
-
-            <div class="proc-section">
-                <h4>📝 解析结果预览</h4>
-                <div class="proc-preview" id="proc-preview-content">
-                    <span class="proc-preview-hint">点击「解析文本」后在此预览</span>
-                </div>
-            </div>
-
-            <div class="dev-actions">
-                <button class="btn btn-success" onclick="exportStartJson()">📥 导出 JSON 文件</button>
-                <button class="btn btn-secondary" onclick="resetProcPanel()">🔄 重置</button>
-            </div>
+        <div class="click-hint">- 点击翻开书页 -</div>
+        <div class="copyright-text">
+            开始游玩即代表接受本作品的一切设定<br>
+            作者不为游玩内容负责
         </div>
     </div>
 </div>
 
-<!-- ==================== 开局详情弹窗 ==================== -->
-<div class="modal-overlay" id="start-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="modal-title">开局标题</h3>
-            <button class="modal-fav" id="modal-fav-btn" onclick="toggleFavoriteCard()">🌼</button>
-            <button class="modal-close" onclick="closeModal('start-modal')">✕</button>
-        </div>
-        <div class="modal-body">
-            <div class="modal-meta">
-                <span class="meta-author" id="modal-author"></span>
-                <span class="meta-time" id="modal-time"></span>
-            </div>
-            <div class="modal-tags" id="modal-tags"></div>
-
-            <div class="modal-section-title">📄 内容粗览</div>
-            <div class="modal-preview" id="modal-preview"></div>
-
-            <div class="modal-section-title" id="modal-associated-title" style="display:none">🔗 关联内容</div>
-            <div class="associated-table" id="modal-associated-table" style="display:none"></div>
-            <div class="associated-batch-row" id="modal-associated-batch" style="display:none">
-                <button class="btn btn-primary btn-sm" onclick="batchCreateAssociatedWorldbooks()">📝 一键创建所选</button>
-                <span class="batch-hint">（为所有勾选但缺失世界书的内容创建）</span>
+<div class="scene" id="scene-inner">
+    <div class="book-inner-container">
+        <div class="tabs-wrapper">
+            <div class="tabs-header">
+                <button class="tab-btn active" data-target="tab1">前言</button>
+                <button class="tab-btn" data-target="tab2">鸣谢</button>
+                <button class="tab-btn" data-target="tab3">初始设置</button>
+                <button class="tab-btn" data-target="tab4">模式选择与世界观调整</button>
+                <button class="tab-btn" data-target="tab7">角色管理</button>
             </div>
 
-            <div class="modal-character-link" id="modal-character-link" style="display:none">
-                <span class="settings-label">👤 关联人物：</span>
-                <span id="modal-character-name"></span>
-            </div>
-            <div class="settings-row" id="modal-worldbook-row" style="display:none">
-                <span class="settings-label">绑定角色世界书：</span>
-                <label class="wb-toggle">
-                    <input type="checkbox" id="modal-bind-worldbook" checked onchange="updateBindWorldbook()">
-                    <span>加载开局时同步绑定</span>
-                </label>
+            <div class="tabs-content-area" id="dynamic-tabs-area">
+
+                <!-- Tab 1 : 前言 -->
+                <div id="tab1" class="tab-panel active">
+                    <div class="sub-tabs-header">
+                        <button class="sub-tab-btn active" onclick="switchSubTab(this, 'tab1-sub1')">前言</button>
+                        <button class="sub-tab-btn" onclick="switchSubTab(this, 'tab1-sub2')">常见问题</button>
+                        <button class="sub-tab-btn" onclick="switchSubTab(this, 'tab1-sub3')">作品信息</button>
+                        <button class="sub-tab-btn" onclick="switchSubTab(this, 'tab1-sub4')">相关推荐</button>
+                    </div>
+                    <div class="sub-panels-wrapper">
+                        <div id="tab1-sub1" class="sub-panel active">
+                            <h2># &#10023; 游玩前必看 &#10023;</h2>
+                            <i class="warning-red">###### 本卡仅免费发布在Discord平台的类脑社区以及内部社群，禁止未经授权的二传/二创，禁止任何形式的收费传播/游玩行为，坚决抵制商业化，请尊重作者的劳动成果</i>
+                            <div style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2); padding:12px; border-radius:6px; margin-top:15px; color:var(--color-text-dark); line-height:1.6;">
+                                <h3 style="color:var(--color-primary-dark); margin-top:0; border-bottom:1px dashed rgba(212,175,55,0.3); padding-bottom:5px;"># &#10022; 游玩指导 </h3>
+                                本作共五个世界观，分为中世纪童话、开拓新大陆与殖民贸易、西部拓荒、东方修仙、西方魔法。在游玩时，你可以选择剧情模式或自由模式：剧情模式有着固定的剧本，且你扮演的角色也是固定的；而自由模式可以自由编辑开局与身份，既可扮演预设好的身份组，也可以自定义人物。其余功能可以自行探索。
+
+                                <h3 style="color:var(--color-primary-dark); margin-top:15px; border-bottom:1px dashed rgba(212,175,55,0.3); padding-bottom:5px;">&#10022; 界面说明</h3>
+                                以下是对游玩界面的相关说明：<br>
+
+                                <b>1. 书签</b><br>
+                                目录：可以进入其他界面<br>
+                                封面：点击后返回封面<br>
+                                翻页：点击翻页<br>
+                                角色：可以管理作品角色或你的自定义角色<br>
+
+                                <b>2. 初始设置</b><br>
+                                控制正文美化 / 纯文字输出<br>
+
+                                <b>3. 模式与世界观</b><br>
+                                选择剧情/自由模式，再选世界观，按选择自动开关对应世界书条目<br>
+
+                                <b>4. 角色管理</b><br>
+                                察看、管理各角色及世界书条目<br>
+
+                            </div>
+                        </div>
+                        <div id="tab1-sub2" class="sub-panel">
+                            <h2># &#10023; 常见问题 &#10023;</h2>
+                            <div style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2); padding:12px; border-radius:6px; margin-bottom:12px;">
+                                <h3 style="color:var(--color-primary-dark); margin-top:0; border-bottom:1px dashed rgba(212,175,55,0.3); padding-bottom:5px;">&#10022; 为什么要把扶她称为伊菈？</h3>
+                                <p style="line-height:1.7; color:var(--color-text-dark);">因为扶她在AI的数据库中有相当多的刻板印象，采用其他名称可以一定程度上规避这些问题。</p>
+                            </div>
+                            <div style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2); padding:12px; border-radius:6px; margin-bottom:12px;">
+                                <h3 style="color:var(--color-primary-dark); margin-top:0; border-bottom:1px dashed rgba(212,175,55,0.3); padding-bottom:5px;">&#10022; 一定要按照剧情线走吗？</h3>
+                                <p style="line-height:1.7; color:var(--color-text-dark);">并非，你可以随时脱离剧情，想走剧情的时候再跟着指引就行。</p>
+                            </div>
+                            <div style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2); padding:12px; border-radius:6px;">
+                                <h3 style="color:var(--color-primary-dark); margin-top:0; border-bottom:1px dashed rgba(212,175,55,0.3); padding-bottom:5px;">&#10022; 我不会玩</h3>
+                                <p style="line-height:1.7; color:var(--color-text-dark);">去类脑看教程！</p>
+                            </div>
+                        </div>
+                        <div id="tab1-sub3" class="sub-panel"><i># 本作品名：《千叶的睡前小故事》
+# 作者：千叶</i>
+                            <div style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2); padding:12px; border-radius:6px; margin-top:15px; color:var(--color-text-dark); line-height:1.6;">
+                                <h3 style="color:var(--color-primary-dark); margin-top:0; border-bottom:1px dashed rgba(212,175,55,0.3); padding-bottom:5px;">## 内容声明 </h3>
+ 本作品是对经典童话故事的魔改，含有伊菈（也就是扶她）、伪娘、乱伦等元素，若选择游玩，则表示完全接受本作品的一切设定，同时，作者不对他人的性癖负责，他人的游玩内容与作者无关。
+                           </div>
+                        </div>
+                        <div id="tab1-sub4" class="sub-panel">
+                            <div style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2); padding:12px; border-radius:6px; margin-top:15px; color:var(--color-text-dark); line-height:1.6;">
+                                <h3 style="color:var(--color-primary-dark); margin-top:0; border-bottom:1px dashed rgba(212,175,55,0.3); padding-bottom:5px;"># - 其他作品 -</h3>
+                                <h3 style="color:var(--color-primary-dark); margin-bottom:4px;">雏菊巡防官</h3>
+                                <h3 style="color:var(--color-primary-dark); margin-bottom:4px;">雏菊预备学院</h3>
+                                <p style="margin-top:12px;">以上作品均发布在类脑平台</p>
+                            </div>
+                        </div>
+    <!-- 脉络式内部轻提示 -->
+    <div class="timeline-toast" id="timeline-toast">已保存</div>
+</div>
+                </div>
+
+                <!-- Tab 2 : 鸣谢 -->
+                <div id="tab2" class="tab-panel">
+                    <div class="sub-tabs-header">
+                        <button class="sub-tab-btn active" onclick="switchSubTab(this, 'tab2-sub1')">鸣谢</button>
+                    </div>
+                    <div class="sub-panels-wrapper">
+                        <div id="tab2-sub1" class="sub-panel active"><h2># &#10023; 鸣谢 &#10023;</h2><i> </i>
+                            <div style="background:rgba(212,175,55,0.08); border:1px solid rgba(212,175,55,0.2); padding:12px; border-radius:6px; margin-top:15px; color:var(--color-text-dark); line-height:1.6;">
+                                <h3 style="color:var(--color-primary-dark); margin-top:0; border-bottom:1px dashed rgba(212,175,55,0.3); padding-bottom:5px;">特别感谢一路陪伴着我的你们<br>
+ 以下排名不分先后（我按照目录从上到下写的）：</h3>
+ 花园猫娘小黑酱（笨蛋AI版）：支持喵~<br>
+ R<br>
+ Single<br>
+ 千叶<br>
+ 御枫千秋：加油&#8593;(&#94;&#969;&#94;)&#8593;<br>
+ 忘却<br>
+ 绝地潜兵ATRH1955号<br>
+ alive_cloud：沙漠里的电线是电线干<br>
+ Star：支持千叶喵，支持千叶谢谢喵~<br>
+ 神数<br>
+ （ 。 | （ 。 ）（身在基米心在鲸版）<br>
+ .gkx.<br>
+ DAS<br>
+ d皿b so fxxk tired<br>
+ FSWMAD<br>
+ jianguanhuya<br>
+ latias39<br>
+ ling<br>
+ lingyu<br>
+ muyu<br>
+ OMO<br>
+ podiu<br>
+ qiushan<br>
+ V<br>
+ &#10048;<br>
+ 曦猫<br>
+ 朔夕<br>
+ 白喵<br>
+ 诺<br>
+ 韵月<br>
+ ws12
+
+                      </div>
+                    </div>
+                    </div>
+                </div>
+
+                <!-- Tab 3 : 初始设置 -->
+                <div id="tab3" class="tab-panel">
+                    <div class="sub-panels-wrapper">
+                        <div id="tab3-sub1" class="sub-panel active"></div>
+                    </div>
+                </div>
+
+                <!-- Tab 4 : 模式选择与世界观调整 -->
+                <div id="tab4" class="tab-panel">
+                    <div class="sub-panels-wrapper">
+                        <div id="tab4-sub1" class="sub-panel active"></div>
+                    </div>
+                </div>
+
+                <!-- Tab 7 : 角色管理 -->
+                <div id="tab7" class="tab-panel">
+                    <div style="padding:15px; flex:1; display:flex; flex-direction:column; overflow:hidden;">
+                        <h2 style="color:var(--color-primary-dark); text-align:center; border-bottom:2px dashed rgba(212,175,55,0.3); padding-bottom:10px; margin-top:0;">&#10023; 角色管理 &#10023;</h2>
+                        <i style="color:var(--color-text-dark); opacity:0.8; text-align:center; font-size:0.9em; margin-bottom:15px; display:block;">你可以在该界面察看、管理各个角色</i>
+                        <div id="char-manage-list" style="flex:1; overflow-y:auto; padding-right:5px; border-radius:6px;">
+                            <div style='text-align:center; padding:20px; opacity:0.7;'>加载中...</div>
+                        </div>
+                        <button class="start-game-btn" style="font-size:1rem; margin-top:10px; padding:8px; font-family:'Noto Serif SC';" onclick="ifConfirmThenPopulate()">&#8635; 刷新</button>
+                    </div>
+                </div>
             </div>
 
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="openViewStartModal()">🔍 查看开局</button>
-                <button class="btn btn-success" onclick="loadStart()">🚀 加载开局</button>
-                <button class="btn btn-primary" onclick="closeModal('start-modal')">关闭</button>
+            <!-- 总目录弹窗 -->
+            <div class="toc-modal" id="tocMenu">
+                <div class="toc-title">章节录</div>
+                <div class="toc-mode-worldview" id="toc-mode-worldview"></div>
+                <div class="toc-list">
+                    <div class="toc-corners">
+                        <div class="toc-corner-btn" onclick="selectFromToc('tab1')">前言</div>
+                        <div class="toc-corner-btn" onclick="selectFromToc('tab2')">鸣谢</div>
+                        <div class="toc-corner-btn" onclick="selectFromToc('tab3')">初始设置</div>
+                        <div class="toc-corner-btn" onclick="selectFromToc('tab4')">模式选择与世界观调整</div>
+                        <div class="toc-corner-btn custom-start" onclick="selectFromToc('tab5')">自定义开局</div>
+                        <div class="toc-corner-btn custom-start" onclick="selectFromToc('tab6')">自定义开局(剧本)</div>
+                        <div class="toc-corner-btn" onclick="selectFromToc('tab7')" style="border-color:#b8860b;">角色管理</div>
+                    </div>
+                    <div class="toc-gallery" style="display:none;">
+                        <div class="toc-img-card" data-mode="script" data-worldview="medieval" onclick="selectFromToc('SM1')"><div class="toc-img-frame"><span class="img-placeholder">努力更新<br>中...</span><img src="https://qianyedoufu.dpdns.org/辛德瑞拉（小时候）.jpg" onload="this.style.opacity=1" onerror="this.style.opacity=0" alt=""></div><div class="toc-img-title">灰姑娘</div></div>
+                        <div class="toc-img-card" data-mode="script" data-worldview="medieval" onclick="selectFromToc('SM2')"><div class="toc-img-frame"><span class="img-placeholder">努力更新<br>中...</span><img src="https://qianyedoufu.dpdns.org/绛娅.jpg"" onload="this.style.opacity=1" onerror="this.style.opacity=0" alt=""></div><div class="toc-img-title">小红帽</div></div>
+                        <div class="toc-img-card" data-mode="script" data-worldview="medieval" onclick="selectFromToc('SM3')"><div class="toc-img-frame"><span class="img-placeholder">努力更新<br>中...</span><img src="https://qianyedoufu.dpdns.org/莉茨.png" onload="this.style.opacity=1" onerror="this.style.opacity=0" alt=""></div><div class="toc-img-title">卖火柴的小女孩</div></div>
+                        <div class="toc-img-card" data-mode="script" data-worldview="medieval" onclick="selectFromToc('SM4')"><div class="toc-img-frame"><span class="img-placeholder">努力更新<br>中...</span><img src="https://qianyedoufu.dpdns.org/龙娘姐妹.png" onload="this.style.opacity=1" onerror="this.style.opacity=0" alt=""></div><div class="toc-img-title">小裁缝<br>一次干七个！</div></div>
+                        <div class="toc-img-card" data-mode="script" data-worldview="medieval" onclick="selectFromToc('SM5')"><div class="toc-img-frame"><span class="img-placeholder">努力更新<br>中...</span><img src="https://qianyedoufu.dpdns.org/白雪公主.jpg" onload="this.style.opacity=1" onerror="this.style.opacity=0" alt=""></div><div class="toc-img-title">白雪公主（制作中）</div></div>
+                        <div class="toc-img-card" data-mode="free" data-worldview="colony" onclick="selectFromToc('FC1')"><div class="toc-img-frame"><span class="img-placeholder">努力更新<br>中...</span><img src="https://qianyedoufu.dpdns.org/海洋.png" onload="this.style.opacity=1" onerror="this.style.opacity=0" alt=""></div><div class="toc-img-title">自定义模式</div></div>
+                    </div>
+                </div>
+                <div class="toc-close-btn" onclick="toggleToc()">关 闭 落 落 长 册</div>
             </div>
+
+            <div class="bookmark-return bookmark-shake" id="bookmark-return" onclick="returnFromChar()" title="返回" style="display:none;">返回</div>
+            <div class="bookmark-menu bookmark-shake" onclick="toggleToc()" title="打开总目录">目录</div>
+            <div class="bookmark-back bookmark-shake" onclick="goBackCover()" title="回到封面">封面</div>
+            <div class="bookmark-next bookmark-shake" onclick="nextPage()" title="点击向后翻看">翻页</div>
+            <div class="bookmark-role bookmark-shake" onclick="goToRoleTab()" title="进入角色管理">角色</div>
         </div>
     </div>
 </div>
 
-<!-- ==================== 查看开局弹窗（大） ==================== -->
-<div class="modal-overlay" id="view-start-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="view-modal-title">开局完整内容</h3>
-            <button class="modal-close" onclick="closeModal('view-start-modal')">✕</button>
-        </div>
-        <div class="modal-body">
-            <div class="view-content-scroll" id="view-full-content"></div>
-            <div class="view-actions-bar">
-                <button class="btn btn-secondary" onclick="closeModal('view-start-modal')">↩️ 返回</button>
-                <button class="btn btn-success" onclick="loadStartFromView()">🚀 加载开局</button>
-            </div>
+<!-- 自定义提示弹窗 -->
+<div class="custom-alert-overlay" id="customAlertOverlay">
+    <div class="custom-alert-box">
+        <div class="alert-border-overlay"></div>
+        <div class="custom-alert-content" id="customAlertMsg">此处显示相关信息...</div>
+        <div class="alert-btn-group">
+            <button class="custom-alert-btn" onclick="handleAlertAction(true)">&#10022; 确 认 &#10022;</button>
+            <button class="custom-alert-btn cancel-btn" id="customAlertCancelBtn" onclick="handleAlertAction(false)">取 消</button>
         </div>
     </div>
 </div>
 
-<!-- ==================== 人物详情弹窗 ==================== -->
-<div class="modal-overlay" id="character-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="character-modal-title">人物名称</h3>
-            <button class="modal-fav" id="character-modal-fav-btn" onclick="toggleFavoriteCharacter()">🌼</button>
-            <button class="modal-close" onclick="closeModal('character-modal')">✕</button>
+<!-- 剧本数据导入专属窗 -->
+<div class="import-modal-overlay" id="importModalOverlay">
+    <div class="custom-alert-box" style="max-width:600px; width:95%;">
+        <div class="alert-border-overlay"></div>
+        <div class="custom-alert-content" style="margin-bottom:10px;">
+            <h3 style="color:var(--color-primary); margin:0 0 10px;">&#10023; 预设开局导入 &#10023;</h3>
+            <div style="font-size:0.8em; margin-bottom:8px; color:var(--color-accent); font-style:italic;">请将你在开局制作器生成的预设开局粘贴在下方</div>
+            <textarea id="importDataInput" placeholder="在此处粘贴生成的预设开局" style="width:100%; height:260px; background:rgba(20,10,40,0.7); color:#fff; border:2px solid rgba(212,175,55,0.5); border-radius:6px; padding:10px; font-family:monospace; font-size:0.9em; box-sizing:border-box; resize:none;"></textarea>
         </div>
-        <div class="modal-body">
-            <div class="modal-meta">
-                <span class="meta-author" id="character-modal-author"></span>
-            </div>
-            <div class="modal-tags" id="character-modal-tags"></div>
-            <div class="modal-section-title">📋 角色简介</div>
-            <div class="modal-preview" id="character-modal-preview"></div>
-            <div class="associated-table" id="character-associated-table" style="margin-bottom: 12px"></div>
-            <div id="character-wb-name-row" class="settings-row" style="display:none">
-                <span class="settings-label">世界书名称（选填）：</span>
-                <input type="text" id="character-wb-name" class="wb-name-input" value="" placeholder="留空则使用默认名称">
-            </div>
-            <div id="character-detail-edit" style="display:none">
-                <div class="modal-section-title">📝 细致编辑</div>
-                <div class="settings-row">
-                    <span class="settings-label">位置：</span>
-                    <select id="detail-position-type" class="wb-select" onchange="toggleDepthFields()">
-                        <option value="at_depth" selected>系统提示中</option>
-                        <option value="before_char">角色定义前</option>
-                        <option value="after_char">角色定义后</option>
-                    </select>
-                </div>
-                <div id="detail-depth-fields">
-                    <div class="settings-row">
-                        <span class="settings-label">角色：</span>
-                        <select id="detail-role" class="wb-select">
-                            <option value="system">system</option>
-                            <option value="assistant">assistant</option>
-                            <option value="user">user</option>
-                        </select>
-                    </div>
-                    <div class="settings-row">
-                        <span class="settings-label">深度：</span>
-                        <input type="number" id="detail-depth" class="wb-name-input" value="4" min="0" max="99" style="width:60px">
-                    </div>
-                </div>
-                <div class="settings-row">
-                    <span class="settings-label">顺序：</span>
-                    <input type="number" id="detail-order" class="wb-name-input" value="0" min="0" max="9999" style="width:80px">
-                </div>
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="mountCharacterGlobal()">🌐 挂载到全局</button>
-                <button class="btn btn-primary" onclick="closeModal('character-modal')">关闭</button>
-            </div>
+        <div class="alert-btn-group" style="margin-top:10px;">
+            <button class="custom-alert-btn" onclick="commitImportData()">&#10038; 导 入 开 局 &#10038;</button>
+            <button class="custom-alert-btn cancel-btn" onclick="closeImportModal()">取 消</button>
         </div>
     </div>
 </div>
 
-<!-- ==================== Mod详情弹窗 ==================== -->
-<div class="modal-overlay" id="mod-modal">
-    <div class="modal-content">
-        <div class="modal-header">
-            <h3 id="mod-modal-title">Mod名称</h3>
-            <button class="modal-fav" id="mod-modal-fav-btn" onclick="toggleFavoriteMod()">🌼</button>
-            <button class="modal-close" onclick="closeModal('mod-modal')">✕</button>
+<!-- 预设载入弹窗 -->
+<div class="preset-modal-overlay" id="presetModalOverlay">
+    <div class="preset-modal-box">
+        <div class="preset-modal-header">&#10023; 预设内容加载 &#10023;</div>
+        <div class="preset-layout">
+            <div class="preset-left" id="presetMenuArea">
+                <button class="preset-list-btn active" onclick="switchPresetType('loc')">地点</button>
+                <button class="preset-list-btn" onclick="switchPresetType('custom')">民俗风情</button>
+                <button class="preset-list-btn" onclick="switchPresetType('combo')">组合</button>
+            </div>
+            <div class="preset-mid">
+                <div class="preset-view-title" id="presetMidTitle">选择可接驳的域界内容</div>
+                <div class="preset-view-scroll" id="presetMidContent"></div>
+            </div>
+            <div class="preset-right">
+                <div class="preset-view-title">右方书撰待承列表</div>
+                <div class="preset-view-scroll" id="presetRightContent" style="padding-right:0px;">
+                    <div style="opacity:0.6; text-align:center; padding:20px; font-style:italic;">选定的界限数据<br>降临于此...</div>
+                </div>
+            </div>
         </div>
-        <div class="modal-body">
-            <div class="modal-meta">
-                <span class="meta-author" id="mod-modal-author"></span>
-            </div>
-            <div class="modal-tags" id="mod-modal-tags"></div>
-            <div class="modal-section-title">📋 内容描述</div>
-            <div class="modal-preview" id="mod-modal-preview"></div>
-            <div class="associated-table" id="mod-associated-table" style="margin-bottom: 12px"></div>
-            <div id="mod-wb-name-row" style="display:none">
-                <div class="settings-row">
-                    <span class="settings-label">世界书名称（选填）：</span>
-                    <input type="text" id="mod-wb-name" class="wb-name-input" value="" placeholder="留空则使用默认名称">
-                </div>
-            </div>
-            <div id="mod-detail-edit" style="display:none">
-                <div class="modal-section-title">📝 细致编辑</div>
-                <div class="settings-row">
-                    <span class="settings-label">位置：</span>
-                    <select id="mod-detail-position-type" class="wb-select" onchange="toggleModDepthFields()">
-                        <option value="at_depth" selected>系统提示中</option>
-                        <option value="before_char">角色定义前</option>
-                        <option value="after_char">角色定义后</option>
-                    </select>
-                </div>
-                <div id="mod-detail-depth-fields">
-                    <div class="settings-row">
-                        <span class="settings-label">角色：</span>
-                        <select id="mod-detail-role" class="wb-select">
-                            <option value="system">system</option>
-                            <option value="assistant">assistant</option>
-                            <option value="user">user</option>
-                        </select>
-                    </div>
-                    <div class="settings-row">
-                        <span class="settings-label">深度：</span>
-                        <input type="number" id="mod-detail-depth" class="wb-name-input" value="4" min="0" max="99" style="width:60px">
-                    </div>
-                </div>
-                <div class="settings-row">
-                    <span class="settings-label">顺序：</span>
-                    <input type="number" id="mod-detail-order" class="wb-name-input" value="0" min="0" max="9999" style="width:80px">
-                </div>
-            </div>
-            <div class="modal-actions">
-                <button class="btn btn-secondary" onclick="mountModGlobal()">🌐 挂载到全局</button>
-                <button class="btn btn-primary" onclick="closeModal('mod-modal')">关闭</button>
-            </div>
+        <div class="preset-footer-bar">
+            <button class="custom-alert-btn" onclick="commitPresetData()">确 认 加 载</button>
+            <button class="custom-alert-btn cancel-btn" onclick="closePresetModal()">拂 卷 退 出</button>
         </div>
     </div>
 </div>
 
-<script src="js/cards.js"></script>
+<!-- JS 加载顺序：core → presets → app → fc1-init → story-loader -->
+<script src="js/core.js"></script>
+<script src="js/presets.js"></script>
 <script src="js/app.js"></script>
+<script src="js/fc1-init.js"></script>
+<!-- 脉络式时间线全屏覆盖层 -->
+<div class="timeline-overlay" id="timeline-overlay">
+    <div class="timeline-top-bar">
+        <span class="timeline-title">&#x2727; 剧情脉络 &#x2727;</span>
+        <div style="display:flex; gap:10px; align-items:center;">
+            <div class="edit-switch-container timeline-edit-switch">
+                <span>修改模式</span>
+                <label class="switch-ui">
+                    <input type="checkbox" id="timeline-edit-chk" onchange="toggleTimelineEditMode(this)">
+                    <span class="slider"></span>
+                </label>
+            </div>
+            <button id="timeline-guide-btn" onclick="showGuidancePopup()">📜 相关指导</button>
+            <button id="timeline-save-btn" onclick="saveInfoCardEdit()" style="display:none;">💾 保存</button>
+            <button class="timeline-close-btn" onclick="closeTimeline()">&#x2715; 关闭</button>
+        </div>
+    </div>
+    <div class="timeline-init-screen" id="timeline-init-screen">
+        <p>建议手机端竖屏查看</p>
+        <button class="timeline-start-btn" onclick="startTimeline()">点击查看</button>
+    </div>
+    <div class="timeline-canvas" id="timeline-canvas" style="display:none;">
+        <div class="timeline-nodes" id="timeline-nodes"></div>
+    </div>
+    <!-- 卡片放大查看/编辑弹窗（在脉络式覆盖层内部） -->
+    <div class="zoom-card-overlay" id="zoomCardOverlay" onclick="closeZoomCard(false)">
+        <div class="zoom-card-box" onclick="event.stopPropagation()">
+            <div class="zoom-card-header">
+                <span id="zoomCardTitle"></span>
+                <span class="zoom-card-close" onclick="closeZoomCard(false)">&times;</span>
+            </div>
+            <div class="zoom-card-body" id="zoomCardBody"></div>
+            <div class="zoom-card-footer" id="zoomCardFooter">
+                <button onclick="closeZoomCard(true)">&#10022; 确 认 &#10022;</button>
+                <button onclick="closeZoomCard(false)" style="background:rgba(253,246,227,0.4);border:1px solid rgba(139,90,43,0.5);color:#8b5a2b;box-shadow:none;">取 消</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script src="js/story-loader.js"></script>
 
 </body>
+</html>
